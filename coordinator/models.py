@@ -13,7 +13,7 @@ class WorkflowState(str, Enum):
     COMPLETED = 'COMPLETED'
 
 
-# Solution Design Report section 7.3. Only intake is executable in Phase 1.
+# Solution Design Report section 7.3. Transitions are applied through authenticated intake or supervisor review.
 ALLOWED_TRANSITIONS = {
     'READY': {'BLOCKED'},
     'BLOCKED': {'UNDER_REVIEW'},

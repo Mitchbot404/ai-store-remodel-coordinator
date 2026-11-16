@@ -1,18 +1,20 @@
 # Remodel Issue and Material Readiness Coordinator
 
-CEN 4010 Final Project, Phase 1: a local non-AI issue tracker based on the Assignment 2 Solution Design Report, sections 7.1–7.4 and implementation step 1. Synthetic data only. No employer systems, integrations, policies, or confidential records.
+CEN 4010 Final Project, Phase 2: authenticated human review of synthetic remodel blockers. Based on the Assignment 2 Solution Design Report. No AI, employer integrations, or confidential data.
 
-## Setup and run
+## Setup
 
-Use Python 3.11 or later. From this folder:
+Use Python 3.11 or later, from this directory:
 
 ```powershell
 py -m venv .venv
 .venv\Scripts\python -m pip install -r requirements-dev.txt
+.venv\Scripts\python manage_users.py associate "Associate"
+.venv\Scripts\python manage_users.py supervisor "Supervisor/Manager"
 .venv\Scripts\python -m streamlit run app.py
 ```
 
-Open http://127.0.0.1:8501. The app binds to localhost. SQLite records persist in `data/prototype.sqlite3`, excluded from Git. Set `REMODEL_DB` to use a different database path.
+Account creation prompts for a password; there are no default credentials. Additional roles are `Stocking/Support` and `Technical/System Owner`. Open http://127.0.0.1:8501 and sign in. Data stays in the ignored `data/prototype.sqlite3`. For a separate database, set `REMODEL_DB` and pass the same path to account provisioning with `--database`.
 
 ```powershell
 .venv\Scripts\python -m pytest -q
@@ -20,18 +22,12 @@ Open http://127.0.0.1:8501. The app binds to localhost. SQLite records persist i
 
 ## Demonstration
 
-Create project `SYN-01`, area `Demo area`, description `Install sample shelf`, sequence `Step 1`, item `Sample shelf`, reporter `demo-associate`, and source `Synthetic plan calls for one shelf`. Observe READY. Report a material-delay blocker with a synthetic delivery note. Observe BLOCKED, UNRESOLVED review, unassigned ownership, preserved sources, and the READY-to-BLOCKED audit event. Restart the app to confirm persistence.
+As an associate, create a synthetic task with a project, area, description, sequence/date, required items, and any available source note. Report a source-backed blocker: READY becomes BLOCKED. Add an observation. Sign out and sign in as a supervisor. Select the task and source, enter an owner, next action, and rationale, and approve UNDER_REVIEW. Review the saved decision and audit history. From UNDER_REVIEW choose waiting, a documented workaround, reassignment, or evidence-backed resolution. Only RESOLVED can advance to COMPLETED. Rejected/unresolved reviews must leave approval fields blank and retain the current state.
 
-## Architecture and authority
+## Architecture
 
-`app.py` provides intake and viewing. `coordinator/models.py` defines the five requested structures and the exact eight-state / eleven-edge graph in report section 7.3. `coordinator/store.py` validates intake and atomically stores records, evidence, and audit history using SQLite. No AI service or external network call is included.
+Streamlit provides intake, source/history viewing, and human review. `coordinator/models.py` preserves the five report structures and eight-state graph. `coordinator/store.py` enforces authorization, validation, and transactional persistence. `coordinator/auth.py` verifies passwords and expiring sessions. `manage_users.py` is a trusted local account-provisioning command. Review decisions and transitions append audit history; original source records are retained.
 
-Task creation initializes READY; a source-backed blocker changes the displayed state to BLOCKED. The state is derived from the linked blocker to avoid two conflicting status values. All other state-changing operations fail closed. ReviewDecision is defined but is not created or applied in Phase 1. Names entered in reporter fields are attribution labels, not authenticated identities.
+See [Phase 2 controls and limitations](docs/phase2.md), [Phase 1 baseline](docs/phase1.md), and [validation evidence](docs/validation.md). The prototype is localhost-only and synthetic-only. It has no MFA, login throttling, enterprise identity, or per-project access partitioning. Local administrators remain trusted. One blocker per task remains the bounded lifecycle model.
 
-## Scope and limitations
-
-This is a local, single-user synthetic prototype, not a deployed operational system. Authentication and roles (NFR-04), supervisor decisions, source-update intake, conflict detection, timing alerts, and subsequent transitions remain unimplemented. No approval controls are exposed. Do not deploy before access controls exist. Database access itself is not protected against a local administrator.
-
-One blocker per task is enforced for this slice; reopening and multiple historical blockers require later lifecycle work. Source captured_at records intake time. Material status may explicitly be UNKNOWN. Required items may be empty to mean no material is required. Sources are append-only through the application; there is no edit/delete API.
-
-See `docs/phase1.md` for traceability and deviations. No remote repository has been created or published; add its URL here after publication.
+No remote repository has been published. Add the repository URL after publication. Phase 3 has not begun.

@@ -1,11 +1,15 @@
 import pytest
 from coordinator.store import Store
+from coordinator.auth import Auth, Role
 from coordinator.models import WorkflowState, ALLOWED_TRANSITIONS
 
 
 @pytest.fixture
 def store(tmp_path):
-    return Store(tmp_path / 'test.sqlite3')
+    path = tmp_path / 'test.sqlite3'
+    auth = Auth(path)
+    auth.provision('demo-associate', 'test-password-123', Role.ASSOCIATE)
+    return Store(path, auth.login('demo-associate', 'test-password-123'))
 
 
 def create(store, **changes):
@@ -27,7 +31,7 @@ def test_round_trip_and_traceability(store):
     key = create(store)
     assert store.case(key)['workflow_state'] == 'READY'
     report(store, key, material_fixture_status='')
-    case = Store(store.path).case(key)
+    case = Store(store.path, store.token).case(key)
     assert case['workflow_state'] == 'BLOCKED'
     assert case['task']['description'] == 'Install sample shelf'
     assert case['blockers'][0]['material_fixture_status'] == 'UNKNOWN'
