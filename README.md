@@ -1,6 +1,6 @@
 # Remodel Issue and Material Readiness Coordinator
 
-CEN 4010 Final Project, Phase 2: authenticated human review of synthetic remodel blockers. Based on the Assignment 2 Solution Design Report. No AI, employer integrations, or confidential data.
+CEN 4010 Final Project, Phase 3: exception handling and representative synthetic remodel scenarios. Based on the Assignment 2 Solution Design Report. No AI, employer integrations, or confidential data.
 
 ## Setup
 
@@ -30,4 +30,4 @@ Streamlit provides intake, source/history viewing, and human review. `coordinato
 
 See [Phase 2 controls and limitations](docs/phase2.md), [Phase 1 baseline](docs/phase1.md), and [validation evidence](docs/validation.md). The prototype is localhost-only and synthetic-only. It has no MFA, login throttling, enterprise identity, or per-project access partitioning. Local administrators remain trusted. One blocker per task remains the bounded lifecycle model.
 
-No remote repository has been published. Add the repository URL after publication. Phase 3 has not begun.
+No remote repository has been published. Add the repository URL after publication. Phase 4 has not begun. See [Phase 3 exception rules and demo instructions](docs/phase3.md).

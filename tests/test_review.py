@@ -29,6 +29,8 @@ def review(s, key, target, **kwargs):
     args = dict(task_id=key, expected_state=c['workflow_state'], decision_type='APPROVED', target=target,
                 owner='Demo team', next_action='Follow recorded action', rationale='Human verifies condition from selected evidence',
                 source_refs=[c['sources'][-1]['source_id']])
+    if target in {'RESOLVED', 'COMPLETED'}:
+        args['corrected_values'] = {'material_fixture_status': 'ARRIVED'}
     args.update(kwargs)
     s.review(**args)
 

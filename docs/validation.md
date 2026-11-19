@@ -1,5 +1,15 @@
 # Phase 1 validation
 
+## Phase 3 validation — November 19, 2026
+
+Initial combined suite: **59 passed in 215.81 seconds**. Includes prior phase tests (with explicit verified material status now supplied before final transitions) and S1–S5, missing/unknown context, source preservation, no automatic transitions, conflict gating/reconciliation/reopening, timing boundaries, overdue/open behavior, workaround recovery history, reassignment context, and supervisor authority. A final run adds a direct missing-critical-context gate test and explicit UNKNOWN source-status assertion.
+
+Manual Streamlit verification used an isolated ignored scenario database on localhost port 8503. Signed in as a synthetic supervisor; inspected S1 short-delay and approaching-target flags; selected S4 and verified the conflict, extended-delay and overdue flags, linked source IDs, and unchanged BLOCKED/UNRESOLVED state. Expanded source information and confirmed both MISSING and ARRIVED records remained. Added an explicit UNKNOWN observation through the UI and verified UNKNOWN_SOURCE_STATUS appeared while the conflict and original workflow state persisted. The review form exposes a conflict rationale and corrected-status field. Reconciliation enforcement and lifecycle completion are automated-test checks, not claims of manually exercising every scenario end-to-end.
+
+No AI integration or real operational data was used. Final-suite result follows below.
+
+Final complete run: **60 passed in 267.87 seconds (4:27)**. No failures. `git diff --check` passed. The temporary manual-demo server was stopped. Phase 3 changes are not committed; no Phase 4 work began.
+
 ## Phase 2 validation — November 16, 2026
 
 The initial combined run passed 38 tests in 114.04 seconds. This included the adapted Phase 1 intake and Streamlit tests, assigned-role allow/deny checks, missing approval details, state/rationale/source validation, persisted decisions, source/audit preservation, logout revocation, and lifecycle branches through waiting, workaround, reassignment, resolution, completion, and return to READY.

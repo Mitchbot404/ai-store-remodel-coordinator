@@ -4,10 +4,11 @@ import streamlit as st
 from coordinator.store import Store
 from coordinator.auth import Auth, Role
 from coordinator.models import ALLOWED_TRANSITIONS
+from coordinator.exceptions import inspect_case, STATUSES
 
 st.set_page_config(page_title='Remodel Coordinator', layout='centered')
 st.title('Remodel Issue and Material Readiness Coordinator')
-st.caption('Phase 2 - Local synthetic-data prototype - Human review controls')
+st.caption('Phase 3 - Synthetic prototype - Exceptions and human review')
 path = Path(os.environ.get('REMODEL_DB', str(Path(__file__).parent / 'data' / 'prototype.sqlite3')))
 path.parent.mkdir(parents=True, exist_ok=True)
 auth = Auth(path)
@@ -64,6 +65,15 @@ else:
     case = store.case(task_id)
     st.subheader(f"Current state: {case['workflow_state']}")
     st.json(case['task'])
+    st.subheader('Exception and review flags')
+    flags = inspect_case(case)
+    if not flags:
+        st.info('No detected exceptions. This is not confirmation of safety or readiness.')
+    for flag in flags:
+        st.warning(flag['code'] + ': ' + flag['message'])
+        st.caption('Source references: ' + ', '.join(str(r) for r in flag['source_refs']) + ' | Fields: ' + ', '.join(flag['fields']))
+    if any(f['blocking'] for f in flags):
+        st.error('Review required: use the permitted UNDER_REVIEW path. Consequential changes are blocked until context is complete and conflicts are reconciled.')
     if not case['blockers'] and role in (Role.ASSOCIATE, Role.SUPERVISOR):
         with st.form('blocker'):
             kind = st.text_input('Blocker type')
@@ -91,9 +101,10 @@ else:
     with st.form('observation'):
         update_type = st.text_input('Update source type', value='Synthetic material update')
         update_note = st.text_area('New source observation')
+        update_status = st.selectbox('Structured material observation (optional)', [''] + list(STATUSES))
         if st.form_submit_button('Add observation'):
             try:
-                store.add_observation(task_id, update_type, update_note)
+                store.add_observation(task_id, update_type, update_note, update_status or None)
                 st.rerun()
             except (ValueError, PermissionError) as error:
                 st.error(str(error))
@@ -108,12 +119,15 @@ else:
             refs = st.multiselect('Supporting sources', [r['source_id'] for r in case['sources']],
                                   format_func=lambda ref: next(r['supported_fields_or_note'] for r in case['sources'] if r['source_id'] == ref))
             material_correction = st.text_input('Corrected material status (optional)')
+            conflict_note = st.text_area('Conflict reconciliation rationale (select all conflicting sources and correct material status)')
             st.caption('For a workaround, record its type, human safety approval, and end condition. For reassignment, record destination, return condition, and why local work is exhausted.')
             details = {field: st.text_input(field.replace('_', ' ').capitalize()) for field in
                        ['workaround_type', 'safety_approval_note', 'end_condition', 'destination_context', 'return_condition', 'local_work_exhausted']}
             if st.form_submit_button('Record human review'):
                 try:
                     corrections = {k: v for k, v in details.items() if v.strip()}
+                    if conflict_note.strip():
+                        corrections['conflict_resolution_note'] = conflict_note
                     if material_correction.strip():
                         corrections['material_fixture_status'] = material_correction
                     store.review(task_id, case['workflow_state'], decision, target, owner, action, rationale, refs, corrections)

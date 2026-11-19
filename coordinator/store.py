@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from .models import AuditEvent, BlockerRecord, SourceReference, TaskRecord, WorkflowState, ReviewDecision, ALLOWED_TRANSITIONS
 from .auth import Auth, Role
+from .exceptions import inspect_case, STATUSES, unknown
 
 
 def now():
@@ -112,13 +113,19 @@ class Store:
     def transition(self, *args, **kwargs):
         raise PermissionError('Use an authenticated supervisor review decision to change state.')
 
-    def add_observation(self, task_id, source_type, note):
+    def add_observation(self, task_id, source_type, note, material_status=None):
         actor = self.authorize()
+        if material_status is not None and material_status not in STATUSES:
+            raise ValueError("Unsupported structured material status.")
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')
             if not db.execute('SELECT 1 FROM tasks WHERE id=?', (task_id,)).fetchone():
                 raise ValueError('Task does not exist.')
             ref = self._source(db, task_id, actor, source_type, note)
+            if material_status is not None:
+                source = json.loads(db.execute('SELECT record FROM sources WHERE id=?', (ref,)).fetchone()[0])
+                source['material_status'] = material_status
+                db.execute('UPDATE sources SET record=? WHERE id=?', (json.dumps(source), ref))
             row = db.execute('SELECT record FROM blockers WHERE task_id=?', (task_id,)).fetchone()
             state = 'READY'
             if row:
@@ -137,7 +144,7 @@ class Store:
             raise ValueError('Invalid review decision.')
         corrections = corrected_values or {}
         allowed_fields = {'material_fixture_status', 'workaround_type', 'safety_approval_note',
-                          'end_condition', 'destination_context', 'return_condition', 'local_work_exhausted'}
+                          'end_condition', 'destination_context', 'return_condition', 'local_work_exhausted', 'conflict_resolution_note'}
         if set(corrections) - allowed_fields or any(not isinstance(v, str) or not v.strip() for v in corrections.values()):
             raise ValueError('Invalid correction fields or values.')
         with self.connect() as db:
@@ -167,6 +174,19 @@ class Store:
             if new == 'REASSIGNED' and new != prior:
                 for field in ('destination_context', 'return_condition', 'local_work_exhausted'):
                     required(**{field: corrections.get(field, '')})
+            context = {'task': json.loads(db.execute('SELECT record FROM tasks WHERE id=?', (task_id,)).fetchone()[0]), 'blockers': [dict(blocker)]}
+            for table in ('sources', 'decisions'):
+                context[table] = [json.loads(r[0]) for r in db.execute(f'SELECT record FROM {table} WHERE task_id=? ORDER BY rowid', (task_id,))]
+            if decision_type in {'APPROVED', 'CORRECTED'}:
+                if 'material_fixture_status' in corrections:
+                    context['blockers'][0]['material_fixture_status'] = corrections['material_fixture_status']
+                context['decisions'].append({'decision_type': decision_type, 'corrected_values': corrections, 'source_refs': source_refs})
+            flags = inspect_case(context)
+            consequential = new != prior and new in {'WORKAROUND_ACTIVE', 'REASSIGNED', 'RESOLVED', 'COMPLETED', 'READY'}
+            if consequential and any(f['blocking'] for f in flags):
+                raise ValueError('Missing context or conflicting evidence requires UNDER_REVIEW and supervisor reconciliation.')
+            if new != prior and new in {'RESOLVED', 'COMPLETED'} and unknown(context['blockers'][0]['material_fixture_status']):
+                raise ValueError('Verify material status before resolution/completion; keep the case under review.')
             decision = ReviewDecision(actor, decision_type, corrections, owner, next_action,
                                       new if new != prior else '', rationale, now())
             record = asdict(decision)
