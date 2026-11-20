@@ -4,3 +4,7 @@ __pycache__/
 data/
 .streamlit/secrets.toml
 *.log
+.env
+.env.*
+*.sqlite3
+*.sqlite3-*

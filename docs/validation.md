@@ -1,5 +1,13 @@
 # Phase 1 validation
 
+## Phase 4 validation — November 19, 2026
+
+Complete Phase 1–4 suite: **80 passed in 196.76 seconds (3:16)**. No failures. Includes S1–S5 candidate generation, exact schema/types, source-reference matching, unsupported facts, removed conflicts, false approval labels, unauthorized next steps, UNKNOWN preservation, deterministic mock behavior, stale-context rejection, persistence, supervisor-only access and provider-failure fallback. Original operational permission/state tests remain in the suite. `git diff --check` passed.
+
+Manual Streamlit checks on isolated port 8504: generated S1 delayed-material, S4 conflicting-source and UNKNOWN-material candidates; observed CANDIDATE labels, source references, preserved UNKNOWN/conflict descriptions, and unchanged BLOCKED states/unassigned ownership. Simulated provider failure through the checkbox: safe error displayed while the structured case, previous validated candidate (with original timestamp), and human review form remained available. No approval was submitted. A serialized before/after comparison of every row in tasks, blockers, sources, decisions and audits matched exactly after all four checks. Three validated candidates were stored separately; the failed attempt added no candidate. Temporary server stopped.
+
+Adversarial test outputs included invented arrival timing, bogus sources, omitted conflict evidence, APPROVED status and an instruction to reassign/resolve. All were rejected; none were operational writes. These were deliberately constructed fake-provider outputs, not discovered live-model hallucinations. No live model credentials or endpoint were used. Provider quality, live endpoint compatibility, latency and free-form summarization usefulness remain unverified. No Phase 5 work or Phase 4 commit was performed.
+
 ## Phase 3 validation — November 19, 2026
 
 Initial combined suite: **59 passed in 215.81 seconds**. Includes prior phase tests (with explicit verified material status now supplied before final transitions) and S1–S5, missing/unknown context, source preservation, no automatic transitions, conflict gating/reconciliation/reopening, timing boundaries, overdue/open behavior, workaround recovery history, reassignment context, and supervisor authority. A final run adds a direct missing-critical-context gate test and explicit UNKNOWN source-status assertion.

@@ -5,10 +5,11 @@ from coordinator.store import Store
 from coordinator.auth import Auth, Role
 from coordinator.models import ALLOWED_TRANSITIONS
 from coordinator.exceptions import inspect_case, STATUSES
+from coordinator.candidates import CandidateService, CandidateError, FailureProvider
 
 st.set_page_config(page_title='Remodel Coordinator', layout='centered')
 st.title('Remodel Issue and Material Readiness Coordinator')
-st.caption('Phase 3 - Synthetic prototype - Exceptions and human review')
+st.caption('Phase 4 - Synthetic prototype - Candidate summaries require human review')
 path = Path(os.environ.get('REMODEL_DB', str(Path(__file__).parent / 'data' / 'prototype.sqlite3')))
 path.parent.mkdir(parents=True, exist_ok=True)
 auth = Auth(path)
@@ -108,6 +109,26 @@ else:
                 st.rerun()
             except (ValueError, PermissionError) as error:
                 st.error(str(error))
+    if role == Role.SUPERVISOR and case['blockers']:
+        st.subheader('CANDIDATE summary - not an approval')
+        st.caption('Default: deterministic mock, not a live AI model. Human review below remains authoritative.')
+        service = CandidateService(store)
+        simulate_failure = st.checkbox('Simulate provider failure (synthetic test only)')
+        if st.button('Generate CANDIDATE summary'):
+            try:
+                service.generate(task_id, FailureProvider() if simulate_failure else None)
+                st.success('Validated candidate saved separately. Operational records unchanged.')
+            except Exception:
+                st.error('Candidate generation failed or was rejected. Continue with the structured case and human review.')
+        try:
+            candidate = service.latest(task_id)
+            if candidate and candidate.get('stale'):
+                st.info('Previous candidate is stale. Generate again using the current evidence.')
+            elif candidate:
+                st.caption('Provider: ' + candidate['provider'])
+                st.json(candidate['package'])
+        except Exception:
+            st.warning('Saved candidate is unavailable or invalid. Use the structured case and human review.')
     if role == Role.SUPERVISOR and case['blockers']:
         with st.form('review'):
             st.subheader('Supervisor review')
