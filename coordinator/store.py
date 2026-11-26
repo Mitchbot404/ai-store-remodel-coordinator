@@ -200,3 +200,30 @@ class Store:
             self._audit(db, task_id, actor, 'REVIEW_' + decision_type, prior, new, list(source_refs))
             if new != prior:
                 self._audit(db, task_id, actor, 'STATE_TRANSITION_APPROVED', prior, new, list(source_refs))
+
+    def evaluate_candidate(self, task_id, candidate_id, outcome, human_status, human_next_step, rationale, source_refs):
+        from .candidates import CandidateService
+        actor = self.authorize((Role.SUPERVISOR,))
+        required(rationale=rationale)
+        if outcome not in {'APPROVED', 'CORRECTED', 'REJECTED', 'UNRESOLVED'}:
+            raise ValueError('Invalid candidate evaluation outcome.')
+        if outcome in {'APPROVED', 'CORRECTED'}:
+            required(human_reviewed_status=human_status, human_reviewed_next_step=human_next_step)
+        with self.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            # The write lock prevents operational changes between validation and recording.
+            case = self.case(task_id)
+            package, provider = CandidateService(self).current(task_id, candidate_id, case)
+            valid = {s['source_id'] for s in case['sources']}
+            if not source_refs or not set(source_refs) <= valid:
+                raise ValueError('Select supporting evidence from this case.')
+            approved = [d for d in case['decisions'] if d.get('scope') != 'CANDIDATE_EVALUATION' and d['decision_type'] in {'APPROVED', 'CORRECTED'}]
+            latest = approved[-1] if approved else {}
+            record = asdict(ReviewDecision(actor, outcome,
+                {'human_reviewed_status': human_status, 'human_reviewed_next_step': human_next_step},
+                latest.get('approved_owner', 'UNASSIGNED'), latest.get('approved_next_action', 'UNASSIGNED'),
+                '', rationale, now()))
+            record.update(scope='CANDIDATE_EVALUATION', candidate_id=str(candidate_id),
+                          candidate_snapshot=package, candidate_provider=provider, source_refs=list(source_refs))
+            db.execute('INSERT INTO decisions VALUES (?, ?, ?)', (str(uuid4()), task_id, json.dumps(record)))
+            self._audit(db, task_id, actor, 'CANDIDATE_EVALUATED', case['workflow_state'], case['workflow_state'], list(source_refs))

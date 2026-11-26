@@ -7,9 +7,9 @@ from coordinator.models import ALLOWED_TRANSITIONS
 from coordinator.exceptions import inspect_case, STATUSES
 from coordinator.candidates import CandidateService, CandidateError, FailureProvider
 
-st.set_page_config(page_title='Remodel Coordinator', layout='centered')
+st.set_page_config(page_title='Remodel Coordinator', layout='wide')
 st.title('Remodel Issue and Material Readiness Coordinator')
-st.caption('Phase 4 - Synthetic prototype - Candidate summaries require human review')
+st.caption('Phase 5 - Synthetic supervisor review package - Human authority retained')
 path = Path(os.environ.get('REMODEL_DB', str(Path(__file__).parent / 'data' / 'prototype.sqlite3')))
 path.parent.mkdir(parents=True, exist_ok=True)
 auth = Auth(path)
@@ -38,7 +38,7 @@ if role == Role.TECHNICAL:
 
 
 if role in (Role.ASSOCIATE, Role.SUPERVISOR):
-    with st.expander('Create remodel task', expanded=True):
+    with st.expander('Create remodel task', expanded=role != Role.SUPERVISOR):
         with st.form('task'):
             project = st.text_input('Synthetic project ID')
             area = st.text_input('Department / area')
@@ -64,6 +64,10 @@ else:
     names = {t["task_id"]: f"{t['department_area']} - {t['description']} ({t['task_id'][:8]})" for t in tasks}
     task_id = st.selectbox('View task', list(names), format_func=names.get)
     case = store.case(task_id)
+    if role == Role.SUPERVISOR and case['blockers']:
+        from coordinator.workbench import render_workbench
+        render_workbench(store, task_id, case)
+        st.stop()
     st.subheader(f"Current state: {case['workflow_state']}")
     st.json(case['task'])
     st.subheader('Exception and review flags')

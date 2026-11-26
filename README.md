@@ -2,7 +2,7 @@
 
 CEN 4010 Final Project: a bounded issue tracker for coordinating a remodel task when fixtures or materials are unavailable. Based on the Assignment 2 Solution Design Report. Synthetic data only; no employer integrations or confidential data.
 
-Phases 1–4 are implemented: task/blocker intake and source history; authenticated human review and workflow controls; exception flags and S1–S5 synthetic scenarios; and candidate-only summaries. Phase 4 defaults to a deterministic mock provider. It does **not** demonstrate validated live-model performance or useful generative reasoning. Phase 5 has not started.
+Phases 1–5 are implemented: task/blocker intake and source history; authenticated human review and workflow controls; exception flags and S1–S5 synthetic scenarios; candidate-only summaries; and an integrated supervisor review package. Candidate generation defaults to a deterministic mock provider. It does **not** demonstrate validated live-model performance or useful generative reasoning. Phase 6 has not started.
 
 ## Setup
 
@@ -46,4 +46,12 @@ The optional generic HTTPS provider adapter is isolated and configured through e
 
 See [Phase 2 controls and limitations](docs/phase2.md), [Phase 1 baseline](docs/phase1.md), and [validation evidence](docs/validation.md). The prototype is localhost-only and synthetic-only. It has no MFA, login throttling, enterprise identity, or per-project access partitioning. Local administrators remain trusted. One blocker per task remains the bounded lifecycle model.
 
-Repository: [Mitchbot404/ai-store-remodel-coordinator](https://github.com/Mitchbot404/ai-store-remodel-coordinator). Phase 5 has not begun. See [Phase 4 candidate controls and provider configuration](docs/phase4.md). See [Phase 3 exception rules and demo instructions](docs/phase3.md).
+### Integrated supervisor review
+
+Select a task with a blocker as SUPERVISOR. The workbench places original evidence and exception flags beside the CANDIDATE package, with approved owner/action and current state above. Source IDs connect the candidate to the original observations. Generate a candidate or continue manually; simulated provider failure leaves the manual controls available.
+
+Use **Record candidate evaluation only** to approve, correct, reject, or leave candidate information unresolved. Supply a rationale and supporting sources; approval/correction also requires a human-reviewed status and proposed step. These evaluations append an existing ReviewDecision with a candidate snapshot and a separately labeled audit event. They do not change operational state or approved owner/action. Use the separate **Record human review** form for operational decisions under the original permission and evidence gates.
+
+Evidence or operational-context changes mark older candidates stale and prevent their evaluation. Regeneration preserves previous versions. Candidate history and prior human decisions remain accessible in the same view. See [Phase 5 implementation and evaluation limitations](docs/phase5.md).
+
+Repository: [Mitchbot404/ai-store-remodel-coordinator](https://github.com/Mitchbot404/ai-store-remodel-coordinator). See [Phase 4 candidate controls and provider configuration](docs/phase4.md) and [Phase 3 exception rules and demo instructions](docs/phase3.md).

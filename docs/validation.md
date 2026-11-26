@@ -1,4 +1,14 @@
-# Phase 1 validation
+# Prototype validation history
+
+## Phase 5 validation — November 25, 2026
+
+Complete local suite: **103 passed in 127.89 seconds**; final pre-commit rerun: **103 passed in 126.01 seconds**. This includes all 80 earlier tests and 23 new integration cases: four candidate evaluation outcomes across S1–S5, candidate-to-human traceability, unchanged task/blocker/source records, appended evaluation audit history, stale/invalid candidate rejection, provider failure, version retention, unauthorized role rejection and preservation of previously approved owner/action. Python and dependencies came from the existing local verification environment; GitHub Actions separately tests the repository environment. `git diff --check` and the staged whitespace check passed. Only the eight intended source/test/documentation files were staged; local data, sessions, credentials and caches remained excluded.
+
+Manual browser checks used the isolated ignored synthetic database on localhost port 8505. S1 showed short-delay/target flags and a clearly labeled deterministic CANDIDATE. Rejection was submitted and persisted without an operational transition. A new source observation made the prior candidate stale and removed its evaluation form; regeneration created a new version. Simulated provider failure showed an error while preserving the earlier candidate and separate operational review controls. S4 displayed both MISSING and ARRIVED sources, a conflict flag and a candidate requiring reconciliation. A CORRECTED candidate evaluation was submitted with both conflicting sources retained; the UI marked it previously evaluated and kept the conflict, BLOCKED state and UNASSIGNED approval values. The saved records were checked directly as well as through the browser. No operational approval was submitted. All five scenario blockers remained BLOCKED.
+
+S2, S3, S5 and approval/unresolved evaluation outcomes were covered by automated tests; no manual execution of those flows is claimed. A screenshot of the S4 supervisor view was captured locally. The temporary server was stopped after verification. The interface exposes full task/blocker details in an expander in addition to the main summary.
+
+The mock provider produced canonical templates. Human correction and rejection were deliberate test inputs, not evidence of live-model errors or measured usefulness. Phase 4 adversarial rejection tests continue to pass. No live model, employer data, production deployment, Phase 6 implementation, final report or presentation was introduced. See [Phase 5](phase5.md) for additive design changes, AI development assistance and requirements for meaningful later evaluation. Earlier sections below are historical phase-time observations, including their then-current commit status.
 
 ## Phase 4 validation — November 19, 2026
 

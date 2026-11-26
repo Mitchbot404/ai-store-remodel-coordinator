@@ -97,7 +97,7 @@ def build_request(case, generated_at):
     blocker = deepcopy(case['blockers'][0])
     if not set(blocker['source_refs']) <= allowed_ids:
         raise CandidateError('Required source context is not authorized or is missing.')
-    approved = [d for d in case['decisions'] if d['decision_type'] in {'APPROVED', 'CORRECTED'}]
+    approved = [d for d in case['decisions'] if d.get('scope') != 'CANDIDATE_EVALUATION' and d['decision_type'] in {'APPROVED', 'CORRECTED'}]
     latest = approved[-1] if approved else {}
     # Explicit whitelist excludes credentials, sessions, unrelated cases and audit logs.
     context = dict(task=deepcopy(case['task']), blocker=blocker, sources=sources,
@@ -129,6 +129,17 @@ def validate(output, request):
     return CandidateReviewPackage(**deepcopy(output))
 
 
+def operational_context(case):
+    result = deepcopy(case)
+    result['decisions'] = [d for d in result['decisions'] if d.get('scope') != 'CANDIDATE_EVALUATION']
+    result['audits'] = [a for a in result['audits'] if a['action'] != 'CANDIDATE_EVALUATED']
+    return result
+
+
+def context_hash(case):
+    return hashlib.sha256(json.dumps(operational_context(case), sort_keys=True).encode()).hexdigest()
+
+
 class CandidateService:
     def __init__(self, operational_store):
         self.store = operational_store
@@ -155,10 +166,13 @@ class CandidateService:
         self._authorize()
         if self.store.case(task_id) != case:
             raise CandidateError('Case changed during generation. Generate a new candidate.')
-        digest = hashlib.sha256(json.dumps(case, sort_keys=True).encode()).hexdigest()
+        digest = context_hash(case)
         with sqlite3.connect(self.path) as db:
             db.execute('CREATE TABLE IF NOT EXISTS candidates (task_id TEXT, context_hash TEXT, provider TEXT, package TEXT)')
-            db.execute('INSERT INTO candidates VALUES (?, ?, ?, ?)', (task_id, digest, provider_name, json.dumps(asdict(package))))
+            columns = {r[1] for r in db.execute('PRAGMA table_info(candidates)')}
+            if 'context_snapshot' not in columns:
+                db.execute('ALTER TABLE candidates ADD COLUMN context_snapshot TEXT')
+            db.execute('INSERT INTO candidates (task_id, context_hash, provider, package, context_snapshot) VALUES (?, ?, ?, ?, ?)', (task_id, digest, provider_name, json.dumps(asdict(package)), json.dumps(operational_context(case))))
         return asdict(package)
 
     def latest(self, task_id):
@@ -167,13 +181,40 @@ class CandidateService:
         if not self.path.exists():
             return None
         with sqlite3.connect(self.path) as db:
-            row = db.execute('SELECT context_hash, provider, package FROM candidates WHERE task_id=? ORDER BY rowid DESC LIMIT 1', (task_id,)).fetchone()
+            row = db.execute('SELECT context_hash, provider, package, rowid FROM candidates WHERE task_id=? ORDER BY rowid DESC LIMIT 1', (task_id,)).fetchone()
         if not row:
             return None
         output = json.loads(row[2])
         # Validate stored content again; stale candidates are not shown as current.
-        if row[0] != hashlib.sha256(json.dumps(case, sort_keys=True).encode()).hexdigest():
+        if row[0] != context_hash(case):
             return {'stale': True}
         request = build_request(case, output.get('generated_at', ''))
         validate(output, request)
-        return {'package': output, 'provider': row[1], 'stale': False}
+        return {'package': output, 'provider': row[1], 'stale': False, 'candidate_id': str(row[3])}
+
+    def history(self, task_id):
+        self._authorize()
+        case = self.store.case(task_id)
+        if not self.path.exists():
+            return []
+        with sqlite3.connect(self.path) as db:
+            rows = db.execute('SELECT rowid, context_hash, provider, package FROM candidates WHERE task_id=? ORDER BY rowid DESC', (task_id,)).fetchall()
+        results = []
+        for identifier, digest, provider, raw in rows:
+            results.append({'candidate_id': str(identifier), 'provider': provider,
+                            'stale': digest != context_hash(case),
+                            'reviewed': any(d.get('candidate_id') == str(identifier) for d in case['decisions']),
+                            'generated_at': json.loads(raw).get('generated_at', 'UNKNOWN')})
+        return results
+
+    def current(self, task_id, candidate_id, case):
+        self._authorize()
+        if not self.path.exists():
+            raise CandidateError('Candidate does not exist.')
+        with sqlite3.connect(self.path) as db:
+            row = db.execute('SELECT context_hash, provider, package FROM candidates WHERE task_id=? AND rowid=?', (task_id, candidate_id)).fetchone()
+        if not row or row[0] != context_hash(case):
+            raise CandidateError('Candidate is missing or stale. Regenerate before reviewing.')
+        output = json.loads(row[2])
+        validate(output, build_request(case, output.get('generated_at', '')))
+        return output, row[1]
