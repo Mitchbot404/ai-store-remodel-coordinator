@@ -4,6 +4,8 @@ The prototype runs locally from the Windows repository. `.streamlit/config.toml`
 
 ## Secure key entry
 
+For the approved 27-trial experiment use the [dedicated evaluation launcher](live-evaluation.md). The Streamlit instructions below are for offline prototype sessions only.
+
 Use your own local PowerShell terminal. Do not paste a key into chat, source files, Git commands, command arguments, screenshots, or GitHub Actions secrets for this exercise. The repository is in OneDrive, so do not save the key in a local `.env` file there either.
 
 1. Follow README setup to create the project's `.venv` and install requirements if necessary.

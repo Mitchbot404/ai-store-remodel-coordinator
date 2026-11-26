@@ -1,5 +1,9 @@
 # Prototype validation history
 
+## Approved live-run preflight — November 26, 2026
+
+The complete offline suite passed **172 tests in 144.64 seconds** on Windows. The focused adapter and experiment suite passed **20 tests in 0.62 seconds**. The new checks exercised 27 scheduled offline generations, S9 preflight rejection, stable case inputs, schema versus evidence rejection, safe failure diagnostics, preservation of usage, stopping after an ambiguous failure and separation of 15 personal worksheets. They prohibit substituting an offline stub for a live trial. The real ledger preflight found zero existing reservations, 30 available slots and $2 of capacity. No API call was used for these checks. The owner approved reference v2; the hidden key prompt and subsequent human exercise require personal participation. [Approval and run procedure](live-evaluation.md)
+
 ## Sporting Goods walkthrough follow-up — November 26, 2026
 
 The owner reported 12 passes at the tested scope and one partial pass across 13 manual checks. The walkthrough was AI-guided and used synthetic records and the deterministic mock. [Observations, root causes, fixes and deferred usability work](sporting-goods-walkthrough.md)

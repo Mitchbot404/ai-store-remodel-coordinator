@@ -1,6 +1,6 @@
 # Phase 6A evidence: offline only
 
-Recorded November 26, 2026. **Live-model evaluation: NOT RUN. Human evaluation: NOT PERFORMED. API charges incurred by this work: $0.** References remain AI-assisted drafts awaiting owner review.
+Recorded November 26, 2026. The project owner approved reference v2 after reviewing the synthetic records. Live technical results and personal review trials are pending. The Windows preflight found nine eligible cases, one required-source rejection (S9), zero ledger reservations and $2 available for reservations. No provider request or connectivity probe was made. Live acceptance rates, latency, token usage, usefulness and billing evidence are unavailable. [Approved experiment and secure launch](live-evaluation.md)
 
 Dataset `phase6a-v2` SHA256: `d1618ef687ca3c0f11f0b2d93fe55482520d0ee7ea902b0d384cef32f11e53db`. Fixed case clock: `2026-11-26T12:00:00+00:00`. The checked-in JSON reports retain execution timestamps and reference hashes.
 
@@ -37,4 +37,4 @@ The fixed evaluation time is November 26 at 12:00 UTC. Each case represents a sn
 
 In S2, S2-INTAKE records the missed shipment on November 23 at 12:00 UTC. S2-LAYOUT records a proposed temporary layout on November 24 at 11:30 UTC. The supervisor approved that layout at 12:00 UTC that day. S2-SRC-1 and S2-SRC-2 retain their original November 26 timestamps and contents. The snapshot reflects the existing supervisor approval and keeps the original blocker open.
 
-The fixture checks cover all ten cases, including task/blocker linkage, timezone-aware event order, source uniqueness within each case, source capture by the evaluation time, and decision-time evidence. S9 retains the deliberately absent source to test preflight rejection. Across the nine accepted cases, both mock reports preserved the authorized source-ID sets, and the structured flags matched the draft expectations. These checks establish record consistency within the synthetic dataset. Final review of the reference judgments is pending.
+The fixture checks cover all ten cases, including task/blocker linkage, timezone-aware event order, source uniqueness within each case, source capture by the evaluation time, and decision-time evidence. S9 retains the deliberately absent source to test preflight rejection. Across the nine accepted cases, both mock reports preserved the authorized source-ID sets, and the structured flags matched the expectations. These checks establish record consistency within the synthetic dataset.

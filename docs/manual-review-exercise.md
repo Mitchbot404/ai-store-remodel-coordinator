@@ -1,5 +1,7 @@
 # Small supervisor-review exercise
 
+After the technical run, generate the 15 individual case worksheets using the [approved experiment instructions](live-evaluation.md). The mock condition uses the archived bounded mock. Live trials use repetition one. Each local worksheet has space for personal responses.
+
 This worksheet is for the project owner to complete personally after reference review and after the corresponding candidate outputs are available. It contains **no participant results**. Do not begin live-condition trials using mock output as a substitute.
 
 ## Consistent task

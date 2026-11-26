@@ -1,6 +1,6 @@
 # Phase 6A: live integration and evaluation preparation
 
-Status: **OFFLINE IMPLEMENTATION; REFERENCE REVIEW AND LIVE EVALUATION PENDING**. November 26, 2026. Phase 6B/6C, public deployment, final report and presentation have not started.
+The project owner approved reference v2 on November 26, 2026. The technical experiment awaits private local key entry. Personal evaluation is pending. [Approved live procedure](live-evaluation.md)
 
 ## Minimal architecture correction
 
@@ -18,7 +18,7 @@ The OpenAI adapter receives serialized context only, with no Store, database, se
 
 ## Evaluation preparation
 
-The ten fixed synthetic cases, separate draft references, metric definitions and blank manual comparison exercise are in `evaluation/` and the linked documents below. The owner must approve or correct references before any live run. The runner does not send reference answers to providers. Invalid required references are rejected before generation. A real provider/validation failure stops further paid attempts in that run. The total budget persists between runs.
+The ten fixed synthetic cases, separate references, metric definitions and blank manual comparison exercise are in `evaluation/` and the linked documents below. The approved runner excludes reference answers from prompts, rejects invalid required sources locally and retains failures. The cumulative ledger persists between runs.
 
 Offline commands:
 
@@ -37,7 +37,7 @@ The additive analysis object preserves the report's candidate structure while al
 
 No live model has been evaluated, and no independent human judgments, usefulness ratings or review times exist yet. The 200-word target is checked for the bounded review-aid labels/questions/recommendations, excluding evidence details; it does not establish whole-screen readability, which needs human review. The canonical package and original evidence remain separately displayed. Timing flags use a fixed generation clock; time passing alone does not invalidate the context hash. Authentication, one-blocker-per-task, trusted local administration and row-ID limitations from Phase 5 remain.
 
-The next step is owner reference review and private local key entry, followed by the approved live experiment and actual human comparison within Phase 6A. Phase 6B readiness cannot be concluded from offline results.
+Private local key entry, the approved live experiment and actual personal comparison remain within Phase 6A.
 
 ## Material AI development assistance
 
