@@ -143,7 +143,7 @@ class Store:
         if decision_type not in {'APPROVED', 'CORRECTED', 'REJECTED', 'UNRESOLVED'}:
             raise ValueError('Invalid review decision.')
         corrections = corrected_values or {}
-        allowed_fields = {'material_fixture_status', 'workaround_type', 'safety_approval_note',
+        allowed_fields = {'material_fixture_status', 'workaround_type', 'safety_approval_note', 'workaround_evidence_ref',
                           'end_condition', 'destination_context', 'return_condition', 'local_work_exhausted', 'conflict_resolution_note'}
         if set(corrections) - allowed_fields or any(not isinstance(v, str) or not v.strip() for v in corrections.values()):
             raise ValueError('Invalid correction fields or values.')
@@ -170,7 +170,20 @@ class Store:
                 required(approved_owner=owner, approved_next_action=next_action)
             if new == 'WORKAROUND_ACTIVE' and new != prior:
                 for field in ('workaround_type', 'safety_approval_note', 'end_condition'):
-                    required(**{field: corrections.get(field, '')})
+                    if unknown(corrections.get(field)):
+                        raise ValueError(f'{field} is required for workaround approval.')
+                ref = corrections.get('workaround_evidence_ref')
+                if ref not in source_refs:
+                    raise ValueError('Identify a cited case observation documenting the proposed workaround.')
+                source = json.loads(db.execute('SELECT record FROM sources WHERE id=? AND task_id=?', (ref, task_id)).fetchone()[0])
+                note = source.get('supported_fields_or_note') or ''
+                label = ' '.join(note.casefold().split()).strip(' .:')
+                labels = {'structured material observation', 'structured observation', source['source_type'].casefold()}
+                if (source.get('authorization_flag') != 'SYNTHETIC' or unknown(label)
+                        or label in labels or label.upper() in STATUSES):
+                    raise ValueError('Record what was observed about the proposed workaround before approving it.')
+            elif 'workaround_evidence_ref' in corrections:
+                raise ValueError('A workaround evidence selection applies only when activating a workaround.')
             if new == 'REASSIGNED' and new != prior:
                 for field in ('destination_context', 'return_condition', 'local_work_exhausted'):
                     required(**{field: corrections.get(field, '')})
@@ -228,5 +241,15 @@ class Store:
             extra = CandidateService(self).analysis_for(task_id, candidate_id, case)
             if extra:
                 record.update(candidate_analysis=extra['analysis'], generation_metadata=extra['generation_metadata'])
+            previous = next((d for d in reversed(case['decisions'])
+                             if d.get('scope') == 'CANDIDATE_EVALUATION'
+                             and d.get('candidate_id') == str(candidate_id)
+                             and d['reviewer_id'] == actor), None)
+            if (previous and previous['decision_type'] == outcome
+                    and previous['rationale_note'].strip() == rationale.strip()
+                    and all((previous['corrected_values'].get(k) or '').strip() == (v or '').strip()
+                            for k, v in record['corrected_values'].items())
+                    and set(previous['source_refs']) == set(source_refs)):
+                raise ValueError('You already recorded this evaluation. Change the review to record a revision.')
             db.execute('INSERT INTO decisions VALUES (?, ?, ?)', (str(uuid4()), task_id, json.dumps(record)))
             self._audit(db, task_id, actor, 'CANDIDATE_EVALUATED', case['workflow_state'], case['workflow_state'], list(source_refs))

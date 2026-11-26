@@ -1,5 +1,11 @@
 # Prototype validation history
 
+## Sporting Goods walkthrough follow-up — November 26, 2026
+
+The owner reported 12 passes at the tested scope and one partial pass across 13 manual checks. The walkthrough was AI-guided and used synthetic records and the deterministic mock. [Observations, root causes, fixes and deferred usability work](sporting-goods-walkthrough.md)
+
+The full local offline suite passed **169 tests in 138.31 seconds**. The four focused walkthrough tests also passed in 6.84 seconds. They exercise observation entry and evidence selection in Streamlit, transactional workaround and duplicate-evaluation gates, and preservation of all operational records and candidate versions across a provider failure followed by manual review. Two existing lifecycle tests now cite an explicit synthetic inspection observation. The source dataset, reference expectations and archived mock outputs remain at revision 2. The original walkthrough was the manual exercise. The post-change form verification used automated Streamlit AppTest.
+
 ## Phase 6A offline preparation — November 26, 2026
 
 Complete suite: **154 passed in 134.87 seconds (2:14)**, including all 103 existing tests unchanged and 51 new cases. Focused validation first passed 39 analysis/adapter tests and 12 integration/UI cases. New coverage includes source whitelisting, unsupported content, fabricated IDs, duplicate/misattributed evidence, conflict/UNKNOWN preservation, prompt-injection text, candidate-only output, malformed/refused/incomplete responses, model identity, timeout redaction, size limits, cumulative concurrent budget reservations, disabled-live gates, stale/corrupt stored analysis, unauthorized roles, S1–S5 operational invariance and candidate-to-human snapshots. Tests globally disable the real OpenAI transport; fake responses are identified as offline stubs.

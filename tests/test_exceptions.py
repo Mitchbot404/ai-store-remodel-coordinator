@@ -101,7 +101,8 @@ def test_conflict_gate_reconciliation_and_new_conflict(demo):
 def test_s2_workaround_recovery_and_s5_reassignment(demo):
     ids, store = demo
     approve(store, ids['S2'], 'UNDER_REVIEW')
-    approve(store, ids['S2'], 'WORKAROUND_ACTIVE', dict(workaround_type='Temporary display', safety_approval_note='Human supplied demo approval', end_condition='Delivery verified'))
+    ref = store.add_observation(ids['S2'], 'Synthetic inspection', 'Supervisor checked the temporary layout against the proposed display plan.')
+    approve(store, ids['S2'], 'WORKAROUND_ACTIVE', dict(workaround_type='Temporary display', safety_approval_note='Human supplied demo approval', end_condition='Delivery verified', workaround_evidence_ref=ref))
     approve(store, ids['S2'], 'WAITING_FOR_MATERIAL')
     store.add_observation(ids['S2'], 'Synthetic recovery', 'New fixture delivered', 'ARRIVED')
     approve(store, ids['S2'], 'UNDER_REVIEW')

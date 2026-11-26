@@ -23,6 +23,8 @@ The first new-test collection failed because a fixture used pytest's reserved na
 
 ## Metrics not yet established
 
+An additional [AI-guided Sporting Goods walkthrough](sporting-goods-walkthrough.md) identified two points to examine in the manual/mock/live comparison. The source described an unconfirmed replacement date while both canonical mock summaries displayed zero missing fields. Both versions proposed the same review step across a change in operational state. This supplementary observation carries no human usefulness score and leaves the frozen v2 evaluation cases and results intact.
+
 Live factual accuracy, semantic source support, live schema pass rate, live conflict/UNKNOWN preservation, unauthorized recommendation rate, live latency, human correction/rejection rates, practical usefulness and manual-vs-live improvement are **NOT MEASURED**. Offline contract checks do not substitute for these results. No blank human fields have been filled with guesses. Failed provider output is sanitized rather than exposed; raw-output semantic error rates cannot be reconstructed from the current coarse failure record alone. Before claiming such rates, extend the reviewed local error-evidence procedure or explicitly mark them unmeasurable.
 
 The next evidence gate is owner review of [reference expectations](reference-expectations.md), followed by secure local key entry and the bounded approved live experiment. Then complete the [human exercise](manual-review-exercise.md). Phase 6A is still incomplete; Phase 6B has not begun.

@@ -67,7 +67,8 @@ def test_lifecycle_and_preserved_history(accounts, branch):
     review(s, key, 'UNDER_REVIEW')
     details = {}
     if branch == 'WORKAROUND_ACTIVE':
-        details = dict(workaround_type='Temporary display', safety_approval_note='Synthetic supervisor approval', end_condition='Fixture arrives')
+        ref = s.add_observation(key, 'Synthetic inspection', 'Supervisor inspected the temporary display in its proposed location.')
+        details = dict(workaround_type='Temporary display', safety_approval_note='Synthetic supervisor approval', end_condition='Fixture arrives', workaround_evidence_ref=ref)
     if branch == 'REASSIGNED':
         details = dict(destination_context='Synthetic store B', return_condition='Fixture arrives', local_work_exhausted='All local tasks blocked')
     review(s, key, branch, corrected_values=details)

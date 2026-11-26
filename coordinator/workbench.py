@@ -39,8 +39,9 @@ def render_workbench(store, task_id, case):
                 st.text(source['supported_fields_or_note'])
                 st.caption('Submitted by ' + source['submitted_by'] + ' | ' + source.get('material_status', 'Unclassified observation'))
         with st.expander('Add source observation'):
-            with st.form('workbench-observation'):
+            with st.form('workbench-observation-' + task_id):
                 note = st.text_area('New source observation')
+                st.caption('Record what you observed here. A material status alone describes the shipment.')
                 status = st.selectbox('Structured observation', [''] + list(STATUSES))
                 if st.form_submit_button('Save observation'):
                     try:
@@ -98,7 +99,8 @@ def render_workbench(store, task_id, case):
                 st.write('**Candidate recorded-status summary**')
                 st.json(json.loads(package['supported_status']))
                 st.write('**Proposed next step for review:**', package['candidate_next_step'])
-                st.write('**Missing / UNKNOWN:**', package['missing_fields'] or 'None flagged')
+                st.write('**Missing / UNKNOWN (structured fields):**', package['missing_fields'] or 'None flagged')
+                st.caption('Original source notes may describe additional uncertainty.')
                 st.write('**Conflicts:**', package['conflicts'] or 'None flagged')
                 st.info(package['uncertainty_note'])
                 st.caption('Source IDs match the original evidence at left: ' + ', '.join(package['source_refs']))
@@ -132,7 +134,7 @@ def render_workbench(store, task_id, case):
 
 
 def operational_review(store, task_id, case):
-    with st.form('review'):
+    with st.form('review-' + task_id):
         st.subheader('Supervisor review')
         decision = st.selectbox('Decision', ['APPROVED', 'CORRECTED', 'REJECTED', 'UNRESOLVED'])
         target = st.selectbox('Approved transition', [''] + sorted(ALLOWED_TRANSITIONS[case['workflow_state']]))
@@ -144,11 +146,20 @@ def operational_review(store, task_id, case):
         material_correction = st.text_input('Corrected material status (optional)')
         conflict_note = st.text_area('Conflict reconciliation rationale (select all conflicting sources and correct material status)')
         st.caption('For a workaround, record its type, human safety approval, and end condition. For reassignment, record destination, return condition, and why local work is exhausted.')
+        notes = {s['source_id']: s['supported_fields_or_note'] for s in case['sources']
+                 if s.get('authorization_flag') == 'SYNTHETIC'}
+        workaround_ref = st.selectbox('Observation I verified supports the proposed workaround',
+                                      list(notes), index=None,
+                                      format_func=lambda ref: notes[ref] + ' — ' + ref,
+                                      help='Required when activating a workaround. This source will be cited in your decision. If the inspection details are missing, record an observation first.')
         details = {field: st.text_input(field.replace('_', ' ').capitalize()) for field in
                    ['workaround_type', 'safety_approval_note', 'end_condition', 'destination_context', 'return_condition', 'local_work_exhausted']}
         if st.form_submit_button('Record human review'):
             try:
                 corrections = {k: v for k, v in details.items() if v.strip()}
+                if target == 'WORKAROUND_ACTIVE' and workaround_ref:
+                    corrections['workaround_evidence_ref'] = workaround_ref
+                    refs = list(dict.fromkeys([*refs, workaround_ref]))
                 if conflict_note.strip():
                     corrections['conflict_resolution_note'] = conflict_note
                 if material_correction.strip():
