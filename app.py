@@ -9,7 +9,7 @@ from coordinator.candidates import CandidateService, CandidateError, FailureProv
 
 st.set_page_config(page_title='Remodel Coordinator', layout='wide')
 st.title('Remodel Issue and Material Readiness Coordinator')
-st.caption('Phase 5 - Synthetic supervisor review package - Human authority retained')
+st.caption('Phase 6A preparation - Synthetic candidate review - Human authority retained')
 path = Path(os.environ.get('REMODEL_DB', str(Path(__file__).parent / 'data' / 'prototype.sqlite3')))
 path.parent.mkdir(parents=True, exist_ok=True)
 auth = Auth(path)

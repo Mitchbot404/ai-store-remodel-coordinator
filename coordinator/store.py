@@ -225,5 +225,8 @@ class Store:
                 '', rationale, now()))
             record.update(scope='CANDIDATE_EVALUATION', candidate_id=str(candidate_id),
                           candidate_snapshot=package, candidate_provider=provider, source_refs=list(source_refs))
+            extra = CandidateService(self).analysis_for(task_id, candidate_id, case)
+            if extra:
+                record.update(candidate_analysis=extra['analysis'], generation_metadata=extra['generation_metadata'])
             db.execute('INSERT INTO decisions VALUES (?, ?, ?)', (str(uuid4()), task_id, json.dumps(record)))
             self._audit(db, task_id, actor, 'CANDIDATE_EVALUATED', case['workflow_state'], case['workflow_state'], list(source_refs))

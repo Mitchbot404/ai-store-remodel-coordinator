@@ -2,7 +2,7 @@
 
 CEN 4010 Final Project: a bounded issue tracker for coordinating a remodel task when fixtures or materials are unavailable. Based on the Assignment 2 Solution Design Report. Synthetic data only; no employer integrations or confidential data.
 
-Phases 1–5 are implemented: task/blocker intake and source history; authenticated human review and workflow controls; exception flags and S1–S5 synthetic scenarios; candidate-only summaries; and an integrated supervisor review package. Candidate generation defaults to a deterministic mock provider. It does **not** demonstrate validated live-model performance or useful generative reasoning. Phase 6 has not started.
+Phases 1–5 are implemented: task/blocker intake and source history; authenticated human review and workflow controls; exception flags and S1–S5 synthetic scenarios; candidate-only summaries; and an integrated supervisor review package. Phase 6A adds offline-tested bounded evidence organization and a gated OpenAI adapter; **reference approval and live evaluation are pending**. Candidate generation still defaults to the original deterministic mock. No validated live-model performance or measured usefulness is claimed. Phase 6B/6C have not started.
 
 ## Setup
 
@@ -42,7 +42,7 @@ Streamlit provides intake, source/history viewing, and human review. `coordinato
 
 `coordinator/exceptions.py` raises deterministic missing/conflicting/timing flags without changing state. `coordinator/candidates.py` supplies the provider interface, exact source-matching validation, and separate candidate storage. A supervisor can generate a clearly labeled CANDIDATE summary or simulate provider failure. Human approval remains required for consequential transitions; candidates cannot change state, ownership, next action, safety decisions, reassignment, workarounds, resolution, or completion.
 
-The optional generic HTTPS provider adapter is isolated and configured through environment variables, with no keys in source. It requires a compatible endpoint and has not been verified against a live model. The current strict validator accepts only the canonical source-linked template and review-only next step, not novel free-form model prose. See the Phase 4 documentation before configuring an external endpoint.
+The original generic HTTPS provider adapter remains available for its custom endpoint contract. The new OpenAI Responses adapter uses GPT-5.4 mini and environment-only credentials. Live requests require reference-review and enablement gates, with a cumulative $2/30-request conservative budget. The canonical package still uses exact-template validation; a separate bounded analysis permits evidence selection/order/grouping and review-only codes. Neither accepts novel model-written factual prose. See [Phase 6A](docs/phase6a.md) and [secure local configuration](docs/provider-configuration.md). No live requests have been made during preparation.
 
 See [Phase 2 controls and limitations](docs/phase2.md), [Phase 1 baseline](docs/phase1.md), and [validation evidence](docs/validation.md). The prototype is localhost-only and synthetic-only. It has no MFA, login throttling, enterprise identity, or per-project access partitioning. Local administrators remain trusted. One blocker per task remains the bounded lifecycle model.
 

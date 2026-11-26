@@ -1,7 +1,8 @@
 """Supervisor package: evidence, candidate evaluation and explicit operational approval."""
 import json
 import streamlit as st
-from .candidates import CandidateService, FailureProvider
+from .candidates import CandidateService, FailureProvider, build_request
+from .analysis import build_analysis_request, render_analysis
 from .exceptions import inspect_case, STATUSES
 from .models import ALLOWED_TRANSITIONS
 
@@ -70,8 +71,27 @@ def render_workbench(store, task_id, case):
             else:
                 package = candidate['package']; identifier = candidate['candidate_id']
                 provider = candidate['provider']
-                label = 'Deterministic mock — no live-model performance demonstrated' if provider in {'mock', 'MockProvider'} else 'External provider: ' + provider + ' — quality not validated'
+                label = 'Deterministic mock — no live-model performance demonstrated' if provider in {'mock', 'MockProvider', 'mock_bounded', 'MockAnalysisProvider'} else 'External provider: ' + provider + ' — quality not validated'
                 st.caption(label)
+                if 'analysis' in candidate:
+                    meta = candidate['generation_metadata']
+                    st.caption('Analysis provenance: ' + meta.get('invocation_mode', 'unverified') +
+                               ' | Model: ' + meta.get('model', 'none'))
+                    st.write('**CANDIDATE review focus — not work priority**')
+                    rendered = render_analysis(candidate['analysis'], build_analysis_request(
+                        build_request(case, package['generated_at'])))
+                    for group in rendered['groups']:
+                        with st.expander(group['label']):
+                            for item in group['items']:
+                                st.text(item['text'])
+                                if item.get('material_status'):
+                                    st.caption('Recorded source status: ' + item['material_status'])
+                                st.caption('Sources: ' + ', '.join(item['source_refs']))
+                    for question in rendered['questions']:
+                        st.write('• ' + question)
+                    for recommendation in rendered['recommendations']:
+                        st.write('• ' + recommendation)
+                    st.caption('Evidence selection and ordering are candidate judgments. Displayed source text is a recorded claim, not independent verification.')
                 st.caption('Candidate ID: ' + identifier + ' | Generated: ' + package['generated_at'])
                 if any(d.get('candidate_id') == identifier for d in case['decisions']):
                     st.info('Previously evaluated candidate. Earlier evaluations remain in the history below.')

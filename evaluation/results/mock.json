@@ -1,0 +1,239 @@
+{
+  "dataset_version": "phase6a-v1",
+  "dataset_sha256": "68ca7d4a5402d30e9b4bdbc9a499ce447dfb4739ef9c2bcc69416fd74d668963",
+  "reference_sha256": "afa69c2aea942c8d6417f51691554f694639d77026a0b7586facaae14f40933f",
+  "case_clock": "2026-11-26T12:00:00+00:00",
+  "executed_at": "2026-11-26T11:48:27.211396+00:00",
+  "mode": "mock",
+  "reference_status": "AI_DRAFT_PENDING_HUMAN_REVIEW",
+  "human_evaluation": "NOT_PERFORMED",
+  "results": [
+    {
+      "case_id": "S1",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S1",
+        "blocker_id": "SYN-EVAL-S1-B",
+        "supported_status": "{\"approved_next_action\": \"UNASSIGNED\", \"approved_owner\": \"UNASSIGNED\", \"recorded_material_status\": \"DELAYED\", \"recorded_workflow_state\": \"BLOCKED\", \"source_observations\": {\"S1-SRC-1\": \"DELAYED\"}}",
+        "source_refs": [
+          "S1-SRC-1",
+          "S1-SRC-2"
+        ],
+        "missing_fields": [],
+        "conflicts": [],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Ask an authorized supervisor to review the cited evidence and open questions.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 0.000291
+    },
+    {
+      "case_id": "S2",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S2",
+        "blocker_id": "SYN-EVAL-S2-B",
+        "supported_status": "{\"approved_next_action\": \"Maintain the documented temporary layout and request an updated delivery observation.\", \"approved_owner\": \"SYN-REMODEL-TEAM\", \"recorded_material_status\": \"DELAYED\", \"recorded_workflow_state\": \"WORKAROUND_ACTIVE\", \"source_observations\": {\"S2-SRC-1\": \"DELAYED\"}}",
+        "source_refs": [
+          "S2-SRC-1",
+          "S2-SRC-2"
+        ],
+        "missing_fields": [],
+        "conflicts": [],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Ask an authorized supervisor to review the cited evidence and open questions.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 0.000187
+    },
+    {
+      "case_id": "S3",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S3",
+        "blocker_id": "SYN-EVAL-S3-B",
+        "supported_status": "{\"approved_next_action\": \"UNASSIGNED\", \"approved_owner\": \"UNASSIGNED\", \"recorded_material_status\": \"DAMAGED\", \"recorded_workflow_state\": \"BLOCKED\", \"source_observations\": {\"S3-SRC-1\": \"DAMAGED\", \"S3-SRC-2\": \"UNKNOWN\"}}",
+        "source_refs": [
+          "S3-SRC-1",
+          "S3-SRC-2"
+        ],
+        "missing_fields": [
+          "Source explicitly reports UNKNOWN material status."
+        ],
+        "conflicts": [],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Request source-backed clarification of missing or UNKNOWN information for supervisor review.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 0.000112
+    },
+    {
+      "case_id": "S4",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S4",
+        "blocker_id": "SYN-EVAL-S4-B",
+        "supported_status": "{\"approved_next_action\": \"UNASSIGNED\", \"approved_owner\": \"UNASSIGNED\", \"recorded_material_status\": \"MISSING\", \"recorded_workflow_state\": \"BLOCKED\", \"source_observations\": {\"S4-SRC-1\": \"MISSING\", \"S4-SRC-2\": \"ARRIVED\"}}",
+        "source_refs": [
+          "S4-SRC-1",
+          "S4-SRC-2"
+        ],
+        "missing_fields": [],
+        "conflicts": [
+          "Arrival and missing/delayed sources disagree. Supervisor reconciliation required; no source selected automatically. Sources: S4-SRC-1, S4-SRC-2"
+        ],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Ask an authorized supervisor to reconcile the conflicting source updates before deciding.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 0.001144
+    },
+    {
+      "case_id": "S5",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S5",
+        "blocker_id": "SYN-EVAL-S5-B",
+        "supported_status": "{\"approved_next_action\": \"UNASSIGNED\", \"approved_owner\": \"UNASSIGNED\", \"recorded_material_status\": \"NO_LOCAL_WORK\", \"recorded_workflow_state\": \"UNDER_REVIEW\", \"source_observations\": {\"S5-SRC-1\": \"NO_LOCAL_WORK\"}}",
+        "source_refs": [
+          "S5-SRC-1",
+          "S5-SRC-2"
+        ],
+        "missing_fields": [],
+        "conflicts": [],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Ask an authorized supervisor to review the cited evidence and open questions.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 0.000214
+    },
+    {
+      "case_id": "S6",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S6",
+        "blocker_id": "SYN-EVAL-S6-B",
+        "supported_status": "{\"approved_next_action\": \"UNASSIGNED\", \"approved_owner\": \"UNASSIGNED\", \"recorded_material_status\": \"UNKNOWN\", \"recorded_workflow_state\": \"BLOCKED\", \"source_observations\": {\"S6-SRC-1\": \"UNKNOWN\"}}",
+        "source_refs": [
+          "S6-SRC-1"
+        ],
+        "missing_fields": [
+          "Task target_date_or_sequence is missing or unknown.",
+          "Required material list is missing or contains unknown items.",
+          "Source explicitly reports UNKNOWN material status.",
+          "Material status is UNKNOWN; verify before resolution/completion."
+        ],
+        "conflicts": [],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Request source-backed clarification of missing or UNKNOWN information for supervisor review.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 0.000248
+    },
+    {
+      "case_id": "S7",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S7",
+        "blocker_id": "SYN-EVAL-S7-B",
+        "supported_status": "{\"approved_next_action\": \"UNASSIGNED\", \"approved_owner\": \"UNASSIGNED\", \"recorded_material_status\": \"UNKNOWN\", \"recorded_workflow_state\": \"BLOCKED\", \"source_observations\": {\"S7-SRC-1\": \"UNKNOWN\"}}",
+        "source_refs": [
+          "S7-SRC-1",
+          "S7-SRC-2"
+        ],
+        "missing_fields": [
+          "Source explicitly reports UNKNOWN material status.",
+          "Material status is UNKNOWN; verify before resolution/completion."
+        ],
+        "conflicts": [],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Request source-backed clarification of missing or UNKNOWN information for supervisor review.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 0.000117
+    },
+    {
+      "case_id": "S8",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S8",
+        "blocker_id": "SYN-EVAL-S8-B",
+        "supported_status": "{\"approved_next_action\": \"UNASSIGNED\", \"approved_owner\": \"UNASSIGNED\", \"recorded_material_status\": \"MISSING\", \"recorded_workflow_state\": \"BLOCKED\", \"source_observations\": {\"S8-SRC-1\": \"MISSING\"}}",
+        "source_refs": [
+          "S8-SRC-1",
+          "S8-SRC-2"
+        ],
+        "missing_fields": [],
+        "conflicts": [],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Ask an authorized supervisor to review the cited evidence and open questions.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 9.3e-05
+    },
+    {
+      "case_id": "S9",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "rejected_or_failed",
+      "failure_stage": "preflight",
+      "error": "Preflight, provider or validation failed; no output accepted.",
+      "elapsed_seconds": 3.2e-05
+    },
+    {
+      "case_id": "S10",
+      "mode": "mock",
+      "human_assessment": null,
+      "status": "validated",
+      "package": {
+        "task_id": "SYN-EVAL-S10",
+        "blocker_id": "SYN-EVAL-S10-B",
+        "supported_status": "{\"approved_next_action\": \"UNASSIGNED\", \"approved_owner\": \"UNASSIGNED\", \"recorded_material_status\": \"DELAYED\", \"recorded_workflow_state\": \"BLOCKED\", \"source_observations\": {\"S10-SRC-1\": \"DELAYED\"}}",
+        "source_refs": [
+          "S10-SRC-1",
+          "S10-SRC-2"
+        ],
+        "missing_fields": [],
+        "conflicts": [],
+        "uncertainty_note": "Recorded values are not independent verification. UNKNOWN stays unknown; conflicts require human review. No safety or operational approval is made by this candidate.",
+        "candidate_next_step": "Ask an authorized supervisor to review the cited evidence and open questions.",
+        "generated_at": "2026-11-26T12:00:00+00:00",
+        "review_state": "CANDIDATE"
+      },
+      "invocation_mode": "deterministic_mock",
+      "elapsed_seconds": 9e-05
+    }
+  ]
+}

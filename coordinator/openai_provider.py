@@ -1,0 +1,171 @@
+"""Opt-in Responses adapter. No operational capability; no retries or secret logs."""
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import sqlite3
+from time import perf_counter
+from urllib.error import HTTPError
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+from uuid import uuid4
+
+from .candidates import CandidateError
+from .analysis import build_analysis_request, validate_analysis, PROMPT_VERSION, SCHEMA_VERSION
+
+MODEL = 'gpt-5.4-mini-2026-03-17'
+ENDPOINT = 'https://api.openai.com/v1/responses'
+MAX_REQUEST_BYTES = 32768
+MAX_RESPONSE_BYTES = 65536
+MAX_OUTPUT_TOKENS = 1500
+TIMEOUT_SECONDS = 20
+# USD in billionths: $0.75 / million input, $4.50 / million output.
+INPUT_RATE = 750
+OUTPUT_RATE = 4500
+BUDGET_NANODOLLARS = 2_000_000_000
+MAX_REQUESTS = 30
+
+
+def budget_path():
+    """One ledger for this Windows user, outside the synced repository."""
+    base = os.environ.get('LOCALAPPDATA')
+    if not base:
+        raise CandidateError('Live evaluation requires the local Windows budget directory.')
+    return Path(base) / 'CEN4010-Remodel-Coordinator' / 'evaluation-budget.sqlite3'
+
+
+class BudgetLedger:
+    """Reserve worst-case spend atomically and never release uncertain charges.
+
+    Reservations persist across processes/runs; there is deliberately no reset API.
+    The trusted local user must not delete this file or switch Windows accounts
+    during the evaluation. Provider project limits remain a second boundary.
+    """
+    def __init__(self, path):
+        self.path = Path(path)
+
+    def reserve(self, request_bytes):
+        # Count the entire JSON payload as potential input tokens plus protocol
+        # overhead. UTF-8 bytes conservatively bound the byte-based tokenizer.
+        amount = (request_bytes + 8192) * INPUT_RATE + MAX_OUTPUT_TOKENS * OUTPUT_RATE
+        if not 0 < request_bytes <= MAX_REQUEST_BYTES:
+            raise CandidateError('Evaluation request exceeds its size limit.')
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(self.path, timeout=10) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS reservations (id TEXT PRIMARY KEY, amount INTEGER NOT NULL, created_at TEXT NOT NULL, outcome TEXT NOT NULL)')
+            db.execute('BEGIN IMMEDIATE')
+            spent, count = db.execute('SELECT COALESCE(SUM(amount),0), COUNT(*) FROM reservations').fetchone()
+            if count >= MAX_REQUESTS:
+                raise CandidateError('The 30-request evaluation limit is exhausted.')
+            if spent + amount > BUDGET_NANODOLLARS:
+                raise CandidateError('The cumulative $2 evaluation budget is exhausted.')
+            identifier = str(uuid4())
+            db.execute('INSERT INTO reservations VALUES (?, ?, ?, ?)',
+                       (identifier, amount, datetime.now(timezone.utc).isoformat(), 'reserved'))
+        return identifier, amount
+
+    def finish(self, identifier, outcome):
+        with sqlite3.connect(self.path) as db:
+            db.execute('UPDATE reservations SET outcome=? WHERE id=?', (outcome, identifier))
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise HTTPError(req.full_url, code, 'Redirect rejected', headers, None)
+
+
+def _send(payload, key):
+    request = Request(ENDPOINT, payload, {
+        'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key,
+    }, method='POST')
+    with build_opener(_NoRedirect()).open(request, timeout=TIMEOUT_SECONDS) as response:
+        raw = response.read(MAX_RESPONSE_BYTES + 1)
+    if len(raw) > MAX_RESPONSE_BYTES:
+        raise ValueError('Oversized response')
+    return json.loads(raw)
+
+
+def _extract(response):
+    if not isinstance(response, dict) or response.get('status') != 'completed' or response.get('error') or response.get('incomplete_details'):
+        raise ValueError('Incomplete response')
+    if response.get('model') != MODEL:
+        raise ValueError('Unexpected model')
+    messages = response.get('output')
+    if not isinstance(messages, list):
+        raise ValueError('Missing output')
+    texts = []
+    for message in messages:
+        if not isinstance(message, dict):
+            raise ValueError('Malformed message')
+        if message.get('type') == 'reasoning':
+            continue
+        if message.get('type') != 'message' or message.get('role') != 'assistant':
+            raise ValueError('Unexpected output type')
+        for part in message.get('content', []):
+            if not isinstance(part, dict) or part.get('type') != 'output_text' or not isinstance(part.get('text'), str):
+                raise ValueError('Refusal or malformed content')
+            texts.append(part['text'])
+    if len(texts) != 1 or len(texts[0].encode('utf-8')) > MAX_RESPONSE_BYTES:
+        raise ValueError('Missing or oversized structured output')
+    usage = response.get('usage', {})
+    counts = {name: usage.get(name) for name in ('input_tokens', 'output_tokens')}
+    if any(type(v) is not int or v < 0 for v in counts.values()):
+        raise ValueError('Missing token usage')
+    return json.loads(texts[0]), counts
+
+
+class OpenAIProvider:
+    """The optional stub transport is for offline tests, never labeled live."""
+    def __init__(self, *, test_transport=None, test_ledger_path=None):
+        if (test_transport is None) != (test_ledger_path is None):
+            raise ValueError('Test transport and temporary ledger must be supplied together.')
+        self._test_transport = test_transport
+        self._test_ledger_path = test_ledger_path
+
+    def analyze(self, legacy_request):
+        if os.environ.get('OPENAI_LIVE_ENABLED') != 'yes' or os.environ.get('PHASE6A_REFERENCE_APPROVED') != 'yes':
+            raise CandidateError('Live generation is disabled until reference review and explicit enablement.')
+        key = os.environ.get('OPENAI_API_KEY', '')
+        if not key.strip():
+            raise CandidateError('Configure OPENAI_API_KEY locally; never paste it into the application.')
+        request = build_analysis_request(legacy_request)
+        context = {k: request[k] for k in (
+            'context', 'catalog', 'required_evidence_ids', 'allowed_question_codes',
+            'allowed_recommendation_codes', 'required_question_codes')}
+        settings = {'reasoning': {'effort': 'none'}, 'max_output_tokens': MAX_OUTPUT_TOKENS, 'store': False}
+        payload = json.dumps({
+            'model': MODEL, 'instructions': request['instructions'],
+            'input': [{'role': 'user', 'content': json.dumps(context, ensure_ascii=False)}],
+            'text': {'format': {'type': 'json_schema', 'name': 'candidate_review_focus',
+                                'strict': True, 'schema': request['schema']}},
+            **settings,
+        }, ensure_ascii=False).encode('utf-8')
+        if len(payload) > MAX_REQUEST_BYTES:
+            raise CandidateError('Evaluation request exceeds its size limit.')
+        ledger = BudgetLedger(self._test_ledger_path if self._test_transport else budget_path())
+        reservation, amount = ledger.reserve(len(payload))
+        started = perf_counter()
+        try:
+            transport = self._test_transport or _send
+            response = transport(payload, key)
+            output, usage = _extract(response)
+            if usage['input_tokens'] > len(payload) + 8192 or usage['output_tokens'] > MAX_OUTPUT_TOKENS:
+                # Keep full reservation; never retry unexpected billing/output.
+                raise ValueError('Unexpected usage')
+            analysis = validate_analysis(output, request)
+            elapsed = perf_counter() - started
+            ledger.finish(reservation, 'validated')
+        except Exception:
+            try:
+                ledger.finish(reservation, 'failed_or_rejected')
+            except Exception:
+                pass  # Existing reservation remains counted even if logging fails.
+            raise CandidateError('OpenAI generation failed or was rejected. No automatic retry; manual review remains available.') from None
+        return {'analysis': analysis, 'metadata': {
+            'provider': 'openai', 'model': MODEL,
+            'invocation_mode': 'offline_stub' if self._test_transport else 'live_response',
+            'prompt_version': PROMPT_VERSION, 'schema_version': SCHEMA_VERSION,
+            'settings': settings, 'latency_seconds': round(elapsed, 6), 'usage': usage,
+            'reserved_cost_usd': amount / 1_000_000_000,
+            'estimated_usage_cost_usd': (usage['input_tokens'] * INPUT_RATE + usage['output_tokens'] * OUTPUT_RATE) / 1_000_000_000,
+            'budget_reservation_id': reservation,
+        }}

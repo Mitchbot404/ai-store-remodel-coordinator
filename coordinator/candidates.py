@@ -82,8 +82,11 @@ class JsonHttpProvider:
 
 
 def configured_provider():
+    from .analysis import MockAnalysisProvider
+    from .openai_provider import OpenAIProvider
     name = os.environ.get('CANDIDATE_PROVIDER', 'mock')
-    choices = {'mock': MockProvider, 'http': JsonHttpProvider}
+    choices = {'mock': MockProvider, 'http': JsonHttpProvider,
+               'mock_bounded': MockAnalysisProvider, 'openai': OpenAIProvider}
     if name not in choices:
         raise CandidateError('Unsupported candidate provider configuration.')
     return choices[name](), name
@@ -155,10 +158,19 @@ class CandidateService:
         stamp = (at or datetime.now(timezone.utc)).isoformat()
         request = build_request(case, stamp)
         provider_name = type(provider).__name__ if provider is not None else None
+        analysis = metadata = None
         try:
             if provider is None:
                 provider, provider_name = configured_provider()
-            output = provider.generate(deepcopy(request))
+            if hasattr(provider, 'analyze'):
+                from .analysis import build_analysis_request, validate_analysis
+                result = provider.analyze(deepcopy(request))
+                analysis = validate_analysis(result['analysis'], build_analysis_request(request))
+                metadata = result['metadata']
+                # The model organizes evidence, but cannot author or replace recorded facts.
+                output = deepcopy(request['template'])
+            else:
+                output = provider.generate(deepcopy(request))
             package = validate(output, request)
         except Exception:
             # Never expose remote exception bodies, keys, or unvalidated model text.
@@ -172,7 +184,13 @@ class CandidateService:
             columns = {r[1] for r in db.execute('PRAGMA table_info(candidates)')}
             if 'context_snapshot' not in columns:
                 db.execute('ALTER TABLE candidates ADD COLUMN context_snapshot TEXT')
-            db.execute('INSERT INTO candidates (task_id, context_hash, provider, package, context_snapshot) VALUES (?, ?, ?, ?, ?)', (task_id, digest, provider_name, json.dumps(asdict(package)), json.dumps(operational_context(case))))
+            for column in ('analysis', 'generation_metadata'):
+                if column not in columns:
+                    db.execute(f'ALTER TABLE candidates ADD COLUMN {column} TEXT')
+            db.execute('INSERT INTO candidates (task_id, context_hash, provider, package, context_snapshot, analysis, generation_metadata) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                       (task_id, digest, provider_name, json.dumps(asdict(package)), json.dumps(operational_context(case)),
+                        json.dumps(analysis) if analysis is not None else None,
+                        json.dumps(metadata) if metadata is not None else None))
         return asdict(package)
 
     def latest(self, task_id):
@@ -190,7 +208,27 @@ class CandidateService:
             return {'stale': True}
         request = build_request(case, output.get('generated_at', ''))
         validate(output, request)
-        return {'package': output, 'provider': row[1], 'stale': False, 'candidate_id': str(row[3])}
+        return {'package': output, 'provider': row[1], 'stale': False, 'candidate_id': str(row[3]),
+                **self.analysis_for(task_id, str(row[3]), case)}
+
+    def analysis_for(self, task_id, candidate_id, case):
+        """Load versioned analysis, validating it against the current authorized case."""
+        self._authorize()
+        with sqlite3.connect(self.path) as db:
+            columns = {r[1] for r in db.execute('PRAGMA table_info(candidates)')}
+            if 'analysis' not in columns:
+                return {}
+            row = db.execute('SELECT context_hash, package, analysis, generation_metadata FROM candidates WHERE task_id=? AND rowid=?', (task_id, candidate_id)).fetchone()
+        if not row or row[0] != context_hash(case):
+            raise CandidateError('Candidate is missing or stale.')
+        if row[2] is None:
+            return {}
+        from .analysis import build_analysis_request, validate_analysis
+        package = json.loads(row[1])
+        request = build_request(case, package.get('generated_at', ''))
+        validate(package, request)
+        analysis = validate_analysis(json.loads(row[2]), build_analysis_request(request))
+        return {'analysis': analysis, 'generation_metadata': json.loads(row[3])}
 
     def history(self, task_id):
         self._authorize()
@@ -217,4 +255,5 @@ class CandidateService:
             raise CandidateError('Candidate is missing or stale. Regenerate before reviewing.')
         output = json.loads(row[2])
         validate(output, build_request(case, output.get('generated_at', '')))
+        self.analysis_for(task_id, candidate_id, case)
         return output, row[1]
