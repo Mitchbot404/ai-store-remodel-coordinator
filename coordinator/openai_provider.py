@@ -1,8 +1,10 @@
 """Opt-in Responses adapter. No operational capability; no retries or secret logs."""
 from datetime import datetime, timezone
+from http.client import HTTPException
 import json
 import os
 from pathlib import Path
+import re
 import sqlite3
 from time import perf_counter
 from urllib.error import HTTPError
@@ -81,12 +83,70 @@ class _NoRedirect(HTTPRedirectHandler):
         raise HTTPError(req.full_url, code, 'Redirect rejected', headers, None)
 
 
-def _send(payload, key):
+SAFE_ERROR_CODES = frozenset({
+    'access_denied', 'billing_hard_limit_reached', 'context_length_exceeded',
+    'insufficient_permissions', 'insufficient_quota', 'invalid_api_key', 'missing_scope',
+    'invalid_request_error', 'model_access_denied', 'model_not_allowed', 'model_not_found',
+    'organization_deactivated', 'permission_denied', 'rate_limit_exceeded',
+    'server_error', 'unsupported_country_region_territory', 'unsupported_model',
+    'unsupported_parameter', 'unsupported_value',
+})
+
+
+def _error_fields(detail):
+    if not isinstance(detail, dict):
+        return {}
+    allowed_types = {'invalid_request_error', 'authentication_error', 'permission_error',
+                     'insufficient_quota', 'rate_limit_error', 'server_error', 'api_error'}
+    fields = {}
+    for name, allowed in [('code', SAFE_ERROR_CODES), ('type', allowed_types)]:
+        value = detail.get(name)
+        if isinstance(value, str) and value:
+            fields['provider_error_' + name] = value if value in allowed else 'unrecognized_' + name
+    return fields
+
+
+def _http_error_fields(error):
+    """Extract only recognized machine codes. Never retain the message, body or headers."""
+    try:
+        raw = error.read(8193)
+        if len(raw) <= 8192:
+            body = json.loads(raw)
+            if isinstance(body, dict):
+                return _error_fields(body.get('error'))
+    except (ValueError, RecursionError, OSError, HTTPException):
+        pass
+    finally:
+        error.close()
+    return {}
+
+
+def _save_server_id(log, headers):
+    identifier = headers.get('x-request-id') if headers else None
+    if isinstance(identifier, str) and re.fullmatch(r'(?:req_[A-Za-z0-9]{1,96}|[a-fA-F0-9]{32}|[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12})', identifier):
+        log.write(json.dumps({'provider_request_id': identifier}) + '\n')
+
+
+def _send(payload, key, ledger, reservation):
+    client_id = str(uuid4())
     request = Request(ENDPOINT, payload, {
         'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key,
+        'X-Client-Request-Id': client_id,
     }, method='POST')
-    with build_opener(_NoRedirect()).open(request, timeout=TIMEOUT_SECONDS) as response:
-        raw = response.read(MAX_RESPONSE_BYTES + 1)
+    directory = ledger.path.parent / 'private-request-ids'
+    directory.mkdir(exist_ok=True)
+    # One private file per reservation, outside the synced repo. Write the client
+    # ID before dispatch so it is available even when no response headers arrive.
+    with (directory / (reservation + '.jsonl')).open('x', encoding='utf-8') as log:
+        log.write(json.dumps({'client_request_id': client_id}) + '\n')
+        log.flush()
+        try:
+            with build_opener(_NoRedirect()).open(request, timeout=TIMEOUT_SECONDS) as response:
+                _save_server_id(log, response.headers)
+                raw = response.read(MAX_RESPONSE_BYTES + 1)
+        except HTTPError as error:
+            _save_server_id(log, error.headers)
+            raise
     if len(raw) > MAX_RESPONSE_BYTES:
         raise ValueError('Oversized response')
     return json.loads(raw)
@@ -159,10 +219,11 @@ class OpenAIProvider:
                         usage=None, estimated_usage_cost_usd=None, schema_valid=None,
                         completed_response=False, failure_stage='provider_failure', reason='transport_error')
         try:
-            transport = self._test_transport or _send
-            response = transport(payload, key)
+            response = (self._test_transport(payload, key) if self._test_transport else
+                        _send(payload, key, ledger, reservation))
             evidence['reason'] = 'unexpected_or_incomplete_response'
             if isinstance(response, dict):
+                evidence.update(_error_fields(response.get('error')))
                 evidence['model'] = MODEL if response.get('model') == MODEL else None
                 evidence['completed_response'] = response.get('status') == 'completed'
                 counts = response.get('usage')
@@ -200,7 +261,7 @@ class OpenAIProvider:
             ledger.finish(reservation, 'validated')
         except Exception as error:
             if isinstance(error, HTTPError):
-                evidence.update(reason='http_error', http_status=error.code)
+                evidence.update(reason='http_error', http_status=error.code, **_http_error_fields(error))
             elif isinstance(error, json.JSONDecodeError) and evidence['completed_response']:
                 evidence.update(failure_stage='validation_rejection', reason='invalid_json', schema_valid=False)
             evidence['latency_seconds'] = round(perf_counter() - started, 6)

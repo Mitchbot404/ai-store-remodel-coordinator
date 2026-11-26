@@ -4,6 +4,30 @@ The project owner approved the frozen v2 inputs on November 26, 2026. The previo
 
 ## Run locally
 
+### Run 02 recovery preparation
+
+The project owner reported correcting the project model allowlist from the family name to the exact snapshot already requested by the application. The dashboard review found no Responses log entry. Run 01 captured HTTP 403 only. Its cause remains unconfirmed.
+
+To verify run 02 offline from the repository, use:
+
+```powershell
+.\.venv\Scripts\python.exe -m live_evaluation --run 02 --check
+```
+
+This checks both frozen input hashes and reconciles run 01's stopped S1 request with its existing reservation in the Windows ledger. It creates no recovery journal and does not prompt for credentials. Run 01 retains its original journal, published result and 1 of the 30 cumulative slots.
+
+**Separate owner approval is pending.** After approval, the private-console launcher accepts `--run 02 --approve-run-02` and uses the existing hidden key prompt. The first request is **S1 repetition 1**, scored in the experiment. Its failure, including an evidence-validation rejection, stops the run. If it validates, the runner continues the existing nine-case, three-repetition schedule, up to 27 requests including that first request. S9 is rejected locally. There is no separate connectivity probe. Subsequent trials use the original stop rules. The model, prompt, references, acceptance thresholds, timeout, token limits and cumulative spending rules are unchanged.
+
+Run 02 exclusively creates `data/phase6a-live-v2-run-02.jsonl`. An existing recovery journal blocks a repeat launch. Keep the original run 01 journal, ledger and worksheets. Account dashboard rounding or a missing Responses log does not release run 01's reservation. Run 02 has 29 slots and $1.98401225 of conservative capacity available at preparation time. The ledger rechecks the limits at each reservation.
+
+### Private diagnostics
+
+For future genuine requests, the transport assigns a fresh client request ID and saves it before dispatch. When available, it also records the recognized OpenAI request ID from the response header on successful and error HTTP responses. These IDs stay under `%LOCALAPPDATA%\CEN4010-Remodel-Coordinator\private-request-ids\` in a file named for the local reservation. To troubleshoot, a local reviewer can match the trial's private reservation to that file. Keep it outside Git, shared reports and worksheets. A failure before any response can leave only the client ID.
+
+For HTTP errors the journal can retain the HTTP status and recognized machine-readable error code and type. Unknown strings become category labels. Oversized, malformed or message-only bodies yield no code. The diagnostic parser reads at most 8,193 bytes and never stores the body, provider message, key or complete headers. Previously missing diagnostics cannot be recovered from run 01.
+
+### Historical run 01
+
 The November 26 run has already stopped after HTTP 403. Its journal and cumulative ledger are retained. The command below documents that run. The current task is the offline [personal exercise](manual-review-exercise.md). [Reconciled results](evaluation-results.md)
 
 From a private PowerShell console in the repository, run:

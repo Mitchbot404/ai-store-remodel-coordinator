@@ -1,5 +1,11 @@
 # Prototype validation history
 
+## Run 02 offline preparation — November 26, 2026
+
+The complete Windows offline suite passed **180 tests in 139.30 seconds**. The focused adapter and evaluator suite passed **28 tests in 1.10 seconds**. In-memory HTTP success and 403 responses exercised client and returned request-ID capture, separation of those IDs from evaluation metadata, and safe error-code/type extraction. Additional checks covered malformed and oversized bodies, missing historical ledger, separate recovery approval, exclusive journals and stopping on a rejected first S1 trial.
+
+The run 02 preflight reconciled S1 repetition 1 from run 01 against the real cumulative ledger in read-only mode. The original journal and ledger had identical SHA-256 digests before and after verification. The ledger still contains one reservation and has 29 attempt slots and $1.98401225 of capacity remaining. No recovery journal was created and no live request was sent. [Recovery procedure](live-evaluation.md)
+
 ## Live run reconciliation and exercise — November 26, 2026
 
 The single S1 request in the journal matched the sole Windows ledger entry by reservation ID and amount. The controller stopped after HTTP 403. The observed failure produced no model response, candidate or operational decision. Codex checked the frozen inputs and both archived mock reports, prepared a sanitized public record and verified all 15 local worksheets against their original cases. Five worksheets show bounded mock outputs, five use manual review and five explicitly use manual fallback. Personal judgments remain blank. The complete offline regression suite passed **172 tests in 141.67 seconds**. Reconciliation and worksheet generation made no further API requests. [Technical results](evaluation-results.md)

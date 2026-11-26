@@ -1,5 +1,6 @@
 """Exercise the frozen run plan and worksheets exclusively with offline transports."""
 import json
+import sqlite3
 from copy import deepcopy
 from hashlib import sha256
 
@@ -68,3 +69,51 @@ def test_frozen_hashes_and_transport_stop(tmp_path):
         stream.seek(0)
         assert [json.loads(line)['status'] for line in stream] == [
             'preflight_rejection', 'scheduled_trial_started', 'provider_failure']
+
+
+def test_recovery_preflight_preserves_history_and_requires_approval(tmp_path, monkeypatch):
+    prior = tmp_path / 'run01.jsonl'
+    journal = tmp_path / 'run02.jsonl'
+    ledger = tmp_path / 'ledger.sqlite3'
+    data = [
+        dict(status='run_started', dataset_sha256=live.DATA_HASH, reference_sha256=live.REFERENCE_HASH, model=MODEL),
+        dict(status='preflight_rejection', case_id='S9', attempts=0),
+        dict(status='scheduled_trial_started', case_id='S1', repetition=1),
+        dict(status='provider_failure', case_id='S1', repetition=1, metadata=dict(invocation_mode='live_attempt',
+             http_status=403, budget_reservation_id='synthetic-reservation', reserved_cost_usd=0.01598775)),
+        dict(status='stopped_after_failed_or_ambiguous_attempt')]
+    prior.write_text('\n'.join(map(json.dumps, data)))
+    monkeypatch.setattr(live, 'JOURNAL', prior)
+    monkeypatch.setattr(live, 'RUN_02_JOURNAL', journal)
+    monkeypatch.setattr(live, 'budget_path', lambda: ledger)
+    monkeypatch.setattr(live, 'allowance', lambda: (29, 1984012250))
+    with pytest.raises(sqlite3.OperationalError):
+        live.main(True, '02')
+    assert not ledger.exists()
+    with sqlite3.connect(ledger) as db:
+        db.execute('CREATE TABLE reservations (id TEXT, amount INTEGER, outcome TEXT)')
+        db.execute("INSERT INTO reservations VALUES ('synthetic-reservation',15987750,'failed_or_rejected')")
+    original = (prior.read_bytes(), ledger.read_bytes())
+    live.main(True, '02')
+    with pytest.raises(ValueError, match='separate owner approval'):
+        live.main(False, '02')
+    assert not journal.exists()
+    journal.write_text('existing run 02')
+    with pytest.raises(ValueError, match='already has a journal'):
+        live.main(False, '02', True)
+    assert journal.read_text() == 'existing run 02'
+    assert original == (prior.read_bytes(), ledger.read_bytes())
+
+
+def test_first_recovery_request_is_scored_s1_and_failure_stops(tmp_path):
+    calls = []
+    class Rejected:
+        def analyze(self, request):
+            calls.append(request['context']['task']['task_id'])
+            raise AttemptFailure(dict(failure_stage='validation_rejection', usage={'input_tokens': 10}))
+    with (tmp_path / 'run02').open('w+') as stream:
+        assert live.collect(stream, Rejected(), live.verified_cases(), recovery=True).startswith('stopped_after')
+        stream.seek(0)
+        gate, scheduled, result = map(json.loads, stream)
+    assert calls == ['SYN-EVAL-S1'] and gate['case_id'] == 'S9' and gate['attempts'] == 0
+    assert all((r['case_id'], r['repetition']) == ('S1', 1) for r in (scheduled, result))

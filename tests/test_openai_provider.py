@@ -1,8 +1,12 @@
 """Paid API access is never used: every provider call has an injected transport."""
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
+from email.message import Message
+from io import BytesIO
 import json
 import sqlite3
+from urllib.error import HTTPError
+from uuid import UUID
 
 import pytest
 
@@ -10,7 +14,7 @@ from coordinator.candidates import CandidateError
 from coordinator.analysis import MockAnalysisProvider
 from coordinator.openai_provider import (
     OpenAIProvider, BudgetLedger, MODEL, MAX_OUTPUT_TOKENS, MAX_REQUEST_BYTES,
-    BUDGET_NANODOLLARS, budget_path,
+    BUDGET_NANODOLLARS, budget_path, _http_error_fields, _send, AttemptFailure,
 )
 
 
@@ -107,6 +111,56 @@ def test_timeout_redacts_provider_exception_and_keeps_reservation(legacy_request
         OpenAIProvider(test_transport=timeout, test_ledger_path=tmp_path/'ledger.sqlite3').analyze(legacy_request)
     assert 'offline-test-placeholder' not in str(error.value)
     assert error.value.__suppress_context__
+
+
+@pytest.mark.parametrize('status', [200, 403])
+def test_private_transport_ids_and_safe_error_fields(status, legacy_request, enabled, tmp_path, monkeypatch):
+    from coordinator import openai_provider as adapter
+    headers = Message()
+    headers['X-Request-Id'] = 'req_Synthetic123'
+    headers['Other'] = 'private-extra-header'
+    sent_ids = []
+
+    class LocalOpener:
+        def open(self, req, timeout):
+            sent_ids.append(req.get_header('X-client-request-id'))
+            if status == 403:
+                detail = dict(code='model_not_found', type='invalid_request_error', message='secret-test-message')
+                raise HTTPError('synthetic', status, 'secret-test-message', headers,
+                                BytesIO(json.dumps({'error': detail}).encode()))
+            response = BytesIO(json.dumps(response_for(legacy_request)).encode())
+            response.headers = headers
+            return response
+
+    # Exercise production header handling with an in-memory opener only.
+    monkeypatch.setattr(adapter, 'build_opener', lambda *_: LocalOpener())
+    monkeypatch.setattr(adapter, '_send', _send)
+    monkeypatch.setattr(adapter, 'budget_path', lambda: tmp_path / 'ledger.sqlite3')
+    if status == 403:
+        with pytest.raises(AttemptFailure) as failed:
+            OpenAIProvider().analyze(legacy_request)
+        metadata = failed.value.evidence
+        assert (metadata['http_status'], metadata['provider_error_code'], metadata['provider_error_type']) == (
+            403, 'model_not_found', 'invalid_request_error')
+    else:
+        metadata = OpenAIProvider().analyze(legacy_request)['metadata']
+    identifier, = sent_ids
+    assert str(UUID(identifier)) == identifier
+    path = tmp_path / 'private-request-ids' / (metadata['budget_reservation_id'] + '.jsonl')
+    assert list(map(json.loads, path.read_text().splitlines())) == [
+        {'client_request_id': identifier}, {'provider_request_id': 'req_Synthetic123'}]
+    for private in [identifier, 'req_Synthetic123', 'private-extra-header', 'secret-test-message', 'offline-test-placeholder']:
+        assert private not in json.dumps(metadata)
+
+
+@pytest.mark.parametrize('body,expected', [
+    (b'{"error":{"code":"secret-code","type":"private-value"}}',
+     {'provider_error_code': 'unrecognized_code', 'provider_error_type': 'unrecognized_type'}),
+    (b'{"error":{"message":"private message"}}', {}), (b'<html>unknown</html>', {}),
+    (b' ' * 8193 + b'{"error":{"code":"model_not_found"}}', {}),
+])
+def test_error_diagnostics_discard_untrusted_content(body, expected):
+    assert _http_error_fields(HTTPError('synthetic', 403, '', {}, BytesIO(body))) == expected
 
 
 def test_oversized_request_never_reaches_transport(legacy_request, enabled, tmp_path):
