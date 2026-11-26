@@ -1,9 +1,9 @@
 {
-  "dataset_version": "phase6a-v1",
-  "dataset_sha256": "68ca7d4a5402d30e9b4bdbc9a499ce447dfb4739ef9c2bcc69416fd74d668963",
-  "reference_sha256": "afa69c2aea942c8d6417f51691554f694639d77026a0b7586facaae14f40933f",
+  "dataset_version": "phase6a-v2",
+  "dataset_sha256": "d1618ef687ca3c0f11f0b2d93fe55482520d0ee7ea902b0d384cef32f11e53db",
+  "reference_sha256": "2f2baf43a64159f7f16b411ec29469fb351dccca33fcb79f20bf81807b688d0d",
   "case_clock": "2026-11-26T12:00:00+00:00",
-  "executed_at": "2026-11-26T11:48:27.495826+00:00",
+  "executed_at": "2026-11-26T12:16:30.883107+00:00",
   "mode": "mock_bounded",
   "reference_status": "AI_DRAFT_PENDING_HUMAN_REVIEW",
   "human_evaluation": "NOT_PERFORMED",
@@ -66,7 +66,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.000678
+      "elapsed_seconds": 0.000727
     },
     {
       "case_id": "S2",
@@ -76,8 +76,10 @@
       "package": {
         "task_id": "SYN-EVAL-S2",
         "blocker_id": "SYN-EVAL-S2-B",
-        "supported_status": "{\"approved_next_action\": \"Maintain the documented temporary layout and request an updated delivery observation.\", \"approved_owner\": \"SYN-REMODEL-TEAM\", \"recorded_material_status\": \"DELAYED\", \"recorded_workflow_state\": \"WORKAROUND_ACTIVE\", \"source_observations\": {\"S2-SRC-1\": \"DELAYED\"}}",
+        "supported_status": "{\"approved_next_action\": \"Maintain the documented temporary layout and request an updated delivery observation.\", \"approved_owner\": \"SYN-REMODEL-TEAM\", \"recorded_material_status\": \"DELAYED\", \"recorded_workflow_state\": \"WORKAROUND_ACTIVE\", \"source_observations\": {\"S2-INTAKE\": \"DELAYED\", \"S2-SRC-1\": \"DELAYED\"}}",
         "source_refs": [
+          "S2-INTAKE",
+          "S2-LAYOUT",
           "S2-SRC-1",
           "S2-SRC-2"
         ],
@@ -94,6 +96,8 @@
           {
             "focus_code": "SOURCE_UPDATES",
             "evidence_ids": [
+              "source:S2-INTAKE",
+              "source:S2-LAYOUT",
               "source:S2-SRC-1",
               "source:S2-SRC-2"
             ]
@@ -126,7 +130,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.001152
+      "elapsed_seconds": 0.000395
     },
     {
       "case_id": "S3",
@@ -204,7 +208,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.000328
+      "elapsed_seconds": 0.000396
     },
     {
       "case_id": "S4",
@@ -274,7 +278,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.000243
+      "elapsed_seconds": 0.000327
     },
     {
       "case_id": "S5",
@@ -342,7 +346,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.000228
+      "elapsed_seconds": 0.000309
     },
     {
       "case_id": "S6",
@@ -416,7 +420,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.000299
+      "elapsed_seconds": 0.000389
     },
     {
       "case_id": "S7",
@@ -488,7 +492,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.000235
+      "elapsed_seconds": 0.000327
     },
     {
       "case_id": "S8",
@@ -548,7 +552,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.000197
+      "elapsed_seconds": 0.000263
     },
     {
       "case_id": "S9",
@@ -557,7 +561,7 @@
       "status": "rejected_or_failed",
       "failure_stage": "preflight",
       "error": "Preflight, provider or validation failed; no output accepted.",
-      "elapsed_seconds": 3.2e-05
+      "elapsed_seconds": 4.2e-05
     },
     {
       "case_id": "S10",
@@ -617,7 +621,7 @@
         "latency_seconds": 0.0,
         "usage": {}
       },
-      "elapsed_seconds": 0.000199
+      "elapsed_seconds": 0.000277
     }
   ]
 }

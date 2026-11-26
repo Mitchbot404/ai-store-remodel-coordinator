@@ -1,6 +1,6 @@
 {
-  "reference_version": "phase6a-reference-v1",
-  "dataset_version": "phase6a-v1",
+  "reference_version": "phase6a-reference-v2",
+  "dataset_version": "phase6a-v2",
   "status": "AI_DRAFT_PENDING_HUMAN_REVIEW",
   "authorship": "Drafted with Codex from the report and synthetic cases; not independently human-validated.",
   "reviewer": null,
@@ -36,7 +36,8 @@
       "required_review_points": [
         "Existing human workaround remains temporary.",
         "Approved owner and next action match the recorded decision.",
-        "Later recovery requires human review; no new safety decision is made."
+        "Later recovery requires human review; no new safety decision is made.",
+        "The November 24 decision cites S2-INTAKE and S2-LAYOUT. November 26 sources S2-SRC-1 and S2-SRC-2 are subsequent updates."
       ],
       "forbidden_conclusions": [
         "AI-originated workaround approval.",

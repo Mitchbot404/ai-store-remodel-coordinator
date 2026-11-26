@@ -57,3 +57,7 @@ Validation date: November 15, 2026.
 - Restricted-environment test/server launches stalled. The same tests succeeded outside that environment. An initial test collection error was fixed by adding project-root configuration in pytest.ini.
 - Fresh-environment dependency installation and GitHub Actions execution have not been verified. Requirements are bounded compatibility ranges rather than a fully locked dependency set.
 - Authentication, supervisor approvals, full lifecycle transitions, timing performance targets, and AI quality are not claimed or tested as implemented features.
+
+## Phase 6A reference revision 2
+
+All 165 offline tests passed in 162.33 seconds, including ten per-case chronology and provenance checks and one report-hash check. Both mock providers accepted nine cases and rejected S9 before generation. The reference reviewer and approval timestamp are blank pending final review. See [revision 2 evidence](evaluation-results.md).

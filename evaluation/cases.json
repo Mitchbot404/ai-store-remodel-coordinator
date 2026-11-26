@@ -1,5 +1,5 @@
 {
-  "dataset_version": "phase6a-v1",
+  "dataset_version": "phase6a-v2",
   "evaluated_at": "2026-11-26T12:00:00+00:00",
   "data_policy": "SYNTHETIC_ONLY",
   "reference_status": "AI_DRAFT_PENDING_HUMAN_REVIEW",
@@ -84,19 +84,38 @@
             "blocker_id": "SYN-EVAL-S2-B",
             "task_id": "SYN-EVAL-S2",
             "blocker_type": "Synthetic fixture readiness",
-            "observed_condition": "Shipment is three days late; a documented temporary layout remains active.",
+            "observed_condition": "Fixture kit unavailable at the planned shipment time.",
             "material_fixture_status": "DELAYED",
             "reported_at": "2026-11-23T12:00:00+00:00",
             "reporter_id": "SYN-ASSOCIATE",
             "source_refs": [
+              "S2-INTAKE",
+              "S2-LAYOUT",
               "S2-SRC-1",
               "S2-SRC-2"
             ],
             "workflow_state": "WORKAROUND_ACTIVE",
-            "review_state": "UNRESOLVED"
+            "review_state": "APPROVED"
           }
         ],
         "sources": [
+          {
+            "source_id": "S2-INTAKE",
+            "source_type": "Synthetic evaluation observation",
+            "captured_at": "2026-11-23T12:00:00+00:00",
+            "submitted_by": "SYN-ASSOCIATE",
+            "supported_fields_or_note": "The planned shipment window has passed. The fixture kit has not arrived.",
+            "authorization_flag": "SYNTHETIC",
+            "material_status": "DELAYED"
+          },
+          {
+            "source_id": "S2-LAYOUT",
+            "source_type": "Synthetic evaluation observation",
+            "captured_at": "2026-11-24T06:30:00-05:00",
+            "submitted_by": "SYN-SUPPORT",
+            "supported_fields_or_note": "Temporary layout sketch recorded for supervisor review. Keep the original layout plan for recovery review after delivery. Approval is pending.",
+            "authorization_flag": "SYNTHETIC"
+          },
           {
             "source_id": "S2-SRC-1",
             "source_type": "Synthetic evaluation observation",
@@ -130,8 +149,8 @@
             "rationale_note": "Synthetic demonstration of a previously approved temporary change.",
             "decided_at": "2026-11-24T12:00:00+00:00",
             "source_refs": [
-              "S2-SRC-1",
-              "S2-SRC-2"
+              "S2-INTAKE",
+              "S2-LAYOUT"
             ]
           }
         ],
