@@ -1,5 +1,9 @@
 # Prototype validation history
 
+## Live run reconciliation and exercise — November 26, 2026
+
+The single S1 request in the journal matched the sole Windows ledger entry by reservation ID and amount. The controller stopped after HTTP 403. The observed failure produced no model response, candidate or operational decision. Codex checked the frozen inputs and both archived mock reports, prepared a sanitized public record and verified all 15 local worksheets against their original cases. Five worksheets show bounded mock outputs, five use manual review and five explicitly use manual fallback. Personal judgments remain blank. The complete offline regression suite passed **172 tests in 141.67 seconds**. Reconciliation and worksheet generation made no further API requests. [Technical results](evaluation-results.md)
+
 ## Approved live-run preflight — November 26, 2026
 
 The complete offline suite passed **172 tests in 144.64 seconds** on Windows. The focused adapter and experiment suite passed **20 tests in 0.62 seconds**. The new checks exercised 27 scheduled offline generations, S9 preflight rejection, stable case inputs, schema versus evidence rejection, safe failure diagnostics, preservation of usage, stopping after an ambiguous failure and separation of 15 personal worksheets. They prohibit substituting an offline stub for a live trial. The real ledger preflight found zero existing reservations, 30 available slots and $2 of capacity. No API call was used for these checks. The owner approved reference v2; the hidden key prompt and subsequent human exercise require personal participation. [Approval and run procedure](live-evaluation.md)

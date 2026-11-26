@@ -1,0 +1,68 @@
+{
+  "run": {
+    "timestamp": "2026-11-26T21:49:46.142948+00:00",
+    "commit": "b011d293a024fa36c67a4662ecfac9245929a65d",
+    "model": "gpt-5.4-mini-2026-03-17",
+    "reference_version": "phase6a-reference-v2",
+    "approved_on": "2026-11-26",
+    "dataset_sha256": "d1618ef687ca3c0f11f0b2d93fe55482520d0ee7ea902b0d384cef32f11e53db",
+    "reference_sha256": "2f2baf43a64159f7f16b411ec29469fb351dccca33fcb79f20bf81807b688d0d",
+    "prompt_version": "review-focus-v1",
+    "schema_version": "bounded-analysis-v1"
+  },
+  "plan": {
+    "eligible_cases": 9,
+    "repetitions": 3,
+    "planned_requests": 27
+  },
+  "preflight": {
+    "case_id": "S9",
+    "status": "preflight_rejection",
+    "attempts": 0,
+    "reason": "invalid_required_source",
+    "timestamp": "2026-11-26T21:49:46.144363+00:00"
+  },
+  "attempts": [
+    {
+      "case_id": "S1",
+      "repetition": 1,
+      "status": "provider_failure",
+      "elapsed_seconds": 1.6616258999565616,
+      "timestamp": "2026-11-26T21:49:47.807237+00:00",
+      "metadata": {
+        "provider": "openai",
+        "requested_model": "gpt-5.4-mini-2026-03-17",
+        "model": null,
+        "invocation_mode": "live_attempt",
+        "settings": {
+          "reasoning": {
+            "effort": "none"
+          },
+          "max_output_tokens": 1500,
+          "store": false
+        },
+        "completed_response": false,
+        "reason": "http_error",
+        "http_status": 403,
+        "schema_valid": null,
+        "usage": null,
+        "estimated_usage_cost_usd": null,
+        "latency_seconds": 1.649106,
+        "reserved_cost_usd": 0.01598775
+      }
+    }
+  ],
+  "disposition": "stopped_after_failed_or_ambiguous_attempt",
+  "unattempted": 26,
+  "accepted_candidates": 0,
+  "validation_rejections": 0,
+  "ledger": {
+    "matching_reservations": 1,
+    "total_reservations": 1,
+    "reserved_nanodollars": 15987750,
+    "remaining_nanodollars": 1984012250,
+    "remaining_attempt_slots": 29,
+    "provider_billed_usd": null
+  },
+  "personal_assessments": []
+}

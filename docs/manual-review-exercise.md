@@ -1,6 +1,8 @@
 # Small supervisor-review exercise
 
-After the technical run, generate the 15 individual case worksheets using the [approved experiment instructions](live-evaluation.md). The mock condition uses the archived bounded mock. Live trials use repetition one. Each local worksheet has space for personal responses.
+Use the numbered links at the end of your local START.md. Open one worksheet, start your timer, answer in that file, record the measured time, then save it before opening the next. The generator protects previously created worksheets from overwrite. [Experiment instructions](live-evaluation.md)
+
+For the November 26 run, trials 3, 5, 7, 11 and 13 use manual fallback. S1 received HTTP 403. The run stopped before S2–S5 were sent. For those five trials, assess the fallback display and leave candidate-specific outcomes and ratings blank. Summarize fallback results separately from the five planned manual trials and five bounded-mock trials. There are zero live-assisted trials to score. Your review of these cases and their references before the exercise may affect your times and judgments.
 
 This worksheet is for the project owner to complete personally after reference review and after the corresponding candidate outputs are available. It contains **no participant results**. Do not begin live-condition trials using mock output as a substitute.
 

@@ -1,6 +1,6 @@
 # Phase 6A: live integration and evaluation preparation
 
-The project owner approved reference v2 on November 26, 2026. The technical experiment awaits private local key entry. Personal evaluation is pending. [Approved live procedure](live-evaluation.md)
+The project owner approved reference v2 on November 26, 2026. The live run stopped at the first request after HTTP 403. The personal evaluation is pending. [Technical results](evaluation-results.md)
 
 ## Minimal architecture correction
 
@@ -37,7 +37,7 @@ The additive analysis object preserves the report's candidate structure while al
 
 No live model has been evaluated, and no independent human judgments, usefulness ratings or review times exist yet. The 200-word target is checked for the bounded review-aid labels/questions/recommendations, excluding evidence details; it does not establish whole-screen readability, which needs human review. The canonical package and original evidence remain separately displayed. Timing flags use a fixed generation clock; time passing alone does not invalidate the context hash. Authentication, one-blocker-per-task, trusted local administration and row-ID limitations from Phase 5 remain.
 
-Private local key entry, the approved live experiment and actual personal comparison remain within Phase 6A.
+The stopped run provides failure-path evidence. Live candidate quality and personal usefulness judgments remain open within Phase 6A.
 
 ## Material AI development assistance
 

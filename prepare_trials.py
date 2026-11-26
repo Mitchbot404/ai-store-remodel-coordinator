@@ -26,7 +26,7 @@ def worksheets(journal=JOURNAL, target=None):
     target = Path(target or ROOT / 'data' / 'phase6a-personal-trials')
     target.mkdir(parents=True, exist_ok=False)  # Protect completed worksheets.
     guide = (ROOT / 'docs/manual-review-exercise.md').read_text(encoding='utf-8')
-    (target / 'START.md').write_text(guide, encoding='utf-8')
+    index = []
     number = 0
     for case_id, sequence in ORDER:
         for condition in sequence:
@@ -50,14 +50,25 @@ def worksheets(journal=JOURNAL, target=None):
                                   '~~~json', json.dumps(result['package'], ensure_ascii=False, indent=2),
                                   '~~~', '~~~json', json.dumps(display, ensure_ascii=False, indent=2), '~~~'])
                 else:
-                    lines.append('Candidate unavailable for the assigned trial. Record manual fallback separately.')
+                    detail = 'No validated live output is available for repetition one.'
+                    if result.get('status') == 'provider_failure':
+                        status = result.get('metadata', {}).get('http_status')
+                        detail = f'The first request returned HTTP {status}.' if status else 'The first provider request failed.'
+                    elif not result and rows[-1].get('status') == 'stopped_after_failed_or_ambiguous_attempt':
+                        detail = 'The run stopped before this case was sent.'
+                    lines[2:2] = ['**Candidate unavailable · manual fallback.** ' + detail,
+                                   'Time your review of the original records. Rate the fallback display. Leave live-candidate judgments blank.']
             lines.extend(['## Personal response', 'Reviewer / date / interruptions:',
                           'Recorded state and material observations with source IDs:',
                           'Missing information or conflict:', 'Approved owner and next action:',
                           'Question for the supervisor:', 'Omission, unsupported claim or implied approval:',
                           'Candidate outcome, correction, rationale and sources (if applicable):',
                           'Actual elapsed seconds:', 'Navigation steps:', 'Usefulness (1–5) and reason:'])
-            (target / f'{number:02d}-{case_id}-{condition}.md').write_text('\n\n'.join(lines) + '\n', encoding='utf-8')
+            filename = f'{number:02d}-{case_id}-{condition}.md'
+            index.append(f'{number}. [{case_id} — {condition}]({filename})')
+            (target / filename).write_text('\n\n'.join(lines) + '\n', encoding='utf-8')
+    (target / 'START.md').write_text(guide + '\n## Open one worksheet at a time\n\n' +
+                                     '\n'.join(index) + '\n', encoding='utf-8')
     return target
 
 

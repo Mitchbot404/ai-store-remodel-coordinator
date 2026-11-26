@@ -4,6 +4,8 @@ The project owner approved the frozen v2 inputs on November 26, 2026. The previo
 
 ## Run locally
 
+The November 26 run has already stopped after HTTP 403. Its journal and cumulative ledger are retained. The command below documents that run. The current task is the offline [personal exercise](manual-review-exercise.md). [Reconciled results](evaluation-results.md)
+
 From a private PowerShell console in the repository, run:
 
 ```powershell

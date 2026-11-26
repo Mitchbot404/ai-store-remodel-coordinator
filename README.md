@@ -2,7 +2,7 @@
 
 CEN 4010 Final Project: a bounded issue tracker for coordinating a remodel task when fixtures or materials are unavailable. Based on the Assignment 2 Solution Design Report. Synthetic data only; no employer integrations or confidential data.
 
-Phases 1–5 implement task and blocker intake, authenticated approvals, exception flags, candidate-only summaries and an integrated supervisor review package. In Phase 6A the project owner approved reference v2 for the bounded GPT-5.4 mini experiment. Live results and the personal review exercise are pending. Candidate generation defaults to the original deterministic mock. [Approved experiment and private PowerShell launch](docs/live-evaluation.md)
+Phases 1–5 implement task and blocker intake, authenticated approvals, exception flags, candidate-only summaries and an integrated supervisor review package. The Phase 6A live experiment stopped after HTTP 403 on its first request. Both deterministic baselines produced candidates for nine eligible cases. The personal exercise is pending. [Technical evaluation](docs/evaluation-results.md) · [Review exercise](docs/manual-review-exercise.md)
 
 ## Setup
 
