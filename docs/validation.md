@@ -1,5 +1,11 @@
 # Prototype validation history
 
+## Run 03 prompt alignment and offline preparation
+
+The final complete offline suite passed **201 tests in 139.53 seconds** (180 baseline tests plus 21 new cases). The focused prompt, adapter and runner suite passed **70 tests in 0.92 seconds**. Replaying the exact S1 choices from run 02 reproduced the duplicate-ID rejection under both versions. A separately constructed fixture passed. The mock transport exercised success, rejection and case-state invariance. Neither test measures the live model's response to v2.
+
+The schema definition, evidence validator, list checks, deterministic renderer and original v1 instruction text matched commit `1b1c0ea`. The final read-only preflight reconciled both prior reservations and verified the two approved input hashes. Before/after fingerprints matched across 41 protected files, including archived journals, reports, datasets, worksheets and the real ledger. Run 03 has no journal and has made zero live requests. [Prompt comparison, proposed stopping rule and prior outcome totals](run03-protocol.md)
+
 ## Run 02 results and human packet
 
 The complete offline suite passed **180 tests in 142.53 seconds** after the live run. Offline replay of the exact returned codes confirmed that the schema accepted the response and the evidence validator rejected the duplicated S1 source. Both journal reservations matched the cumulative ledger; the run 01 journal hash and frozen evaluation inputs were unchanged. The 15 new worksheet links, original case records, flags, archived mock packages, fallback labels and blank response fields were checked locally. No live call was used for replay or packet preparation. Codex prepared the technical analysis. Human assessments remain outstanding. [Results](evaluation-results.md)

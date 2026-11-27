@@ -11,6 +11,7 @@ from coordinator.store import Store
 from coordinator.scenarios import build_demo
 from coordinator.candidates import CandidateService, CandidateError
 from coordinator.analysis import MockAnalysisProvider
+from coordinator.openai_provider import MODEL, OpenAIProvider
 from evaluate_ai import run
 
 AT = datetime(2026, 11, 26, 12, tzinfo=timezone.utc)
@@ -21,6 +22,30 @@ def demo(tmp_path_factory):
     path = tmp_path_factory.mktemp('phase6a') / 'demo.sqlite3'
     ids = build_demo(path, 'offline-fixture-password', AT)
     return ids, Store(path, Auth(path).login('SUPERVISOR', 'offline-fixture-password'))
+
+
+def test_v2_stub_generation_preserves_operational_case(demo, tmp_path, monkeypatch):
+    ids, store = demo
+    key = ids['S4']
+    before = store.case(key)
+    service = CandidateService(store)
+    monkeypatch.setenv('OPENAI_LIVE_ENABLED', 'yes')
+    monkeypatch.setenv('PHASE6A_REFERENCE_APPROVED', 'yes')
+    monkeypatch.setenv('OPENAI_API_KEY', 'offline-test-placeholder')
+    from coordinator.candidates import build_request
+    choices = MockAnalysisProvider().analyze(build_request(before, AT.isoformat()))['analysis']
+    def transport(payload, key):
+        return dict(model=MODEL, status='completed', usage=dict(input_tokens=100, output_tokens=40),
+                    output=[dict(type='message', role='assistant', content=[
+                        dict(type='output_text', text=json.dumps(choices))])])
+    provider = OpenAIProvider(test_transport=transport, test_ledger_path=tmp_path/'ledger')
+    service.generate(key, provider, AT)
+    assert store.case(key) == before
+    metadata = service.latest(key)['generation_metadata']
+    assert (metadata['prompt_version'], metadata['invocation_mode']) == ('review-focus-v2', 'offline_stub')
+    choices['review_state'] = 'APPROVED'
+    with pytest.raises(CandidateError): service.generate(key, provider, AT)
+    assert store.case(key) == before
 
 
 @pytest.mark.parametrize('scenario', ['S1', 'S2', 'S3', 'S4', 'S5'])

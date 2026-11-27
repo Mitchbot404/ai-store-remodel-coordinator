@@ -5,7 +5,7 @@ from pathlib import Path
 
 from coordinator.analysis import build_analysis_request, render_analysis
 from coordinator.candidates import build_request
-from live_evaluation import DATA_HASH, REFERENCE_HASH, JOURNAL, RUN_02_JOURNAL, ROOT, verified_cases
+from live_evaluation import DATA_HASH, REFERENCE_HASH, JOURNAL, RUN_02_JOURNAL, RUN_03_JOURNAL, ROOT, verified_cases
 
 ORDER = [
     ('S1', ('Manual', 'Mock', 'Live')), ('S2', ('Mock', 'Live', 'Manual')),
@@ -24,7 +24,9 @@ def worksheets(journal=JOURNAL, target=None):
     mocks = {r['case_id']: r for r in mock['results']}
     dataset = json.loads((ROOT / 'evaluation/cases.json').read_bytes())
     cases = {entry['id']: entry['case'] for entry in dataset['cases']}
-    folder = 'phase6a-personal-trials-run-02' if rows[0].get('run') == '02' else 'phase6a-personal-trials'
+    folder = 'phase6a-personal-trials'
+    if rows[0].get('run') in {'02', '03'}:
+        folder += '-run-' + rows[0]['run']
     target = Path(target or ROOT / 'data' / folder)
     target.mkdir(parents=True, exist_ok=False)  # Protect completed worksheets.
     guide = (ROOT / 'docs/manual-review-exercise.md').read_text(encoding='utf-8')
@@ -78,5 +80,6 @@ def worksheets(journal=JOURNAL, target=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--run', choices=['01', '02'], default='01')
-    print(worksheets(RUN_02_JOURNAL if parser.parse_args().run == '02' else JOURNAL))
+    parser.add_argument('--run', choices=['01', '02', '03'], default='01')
+    journals = {'01': JOURNAL, '02': RUN_02_JOURNAL, '03': RUN_03_JOURNAL}
+    print(worksheets(journals[parser.parse_args().run]))

@@ -4,6 +4,8 @@ The project owner approved the frozen v2 inputs on November 26, 2026. The previo
 
 ## Run locally
 
+Run 03 has a versioned prompt intervention and a proposed change to the first-trial stopping rule. It requires separate owner approval. [Prompt audit and proposed run 03 protocol](run03-protocol.md)
+
 ### Run 02 recovery record
 
 The project owner reported correcting the project model allowlist from the family name to the exact snapshot already requested by the application. The dashboard review found no Responses log entry. Run 01 captured HTTP 403 only. Its cause remains unconfirmed.

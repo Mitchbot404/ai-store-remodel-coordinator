@@ -183,10 +183,11 @@ def _extract(response):
 
 class OpenAIProvider:
     """The optional stub transport is for offline tests, never labeled live."""
-    def __init__(self, *, test_transport=None, test_ledger_path=None):
+    def __init__(self, *, prompt_version=PROMPT_VERSION, test_transport=None, test_ledger_path=None):
         if (test_transport is None) != (test_ledger_path is None):
             raise ValueError('Test transport and temporary ledger must be supplied together.')
         self._test_transport = test_transport
+        self.prompt_version = prompt_version
         self._test_ledger_path = test_ledger_path
 
     def analyze(self, legacy_request):
@@ -195,7 +196,7 @@ class OpenAIProvider:
         key = os.environ.get('OPENAI_API_KEY', '')
         if not key.strip():
             raise CandidateError('Configure OPENAI_API_KEY locally; never paste it into the application.')
-        request = build_analysis_request(legacy_request)
+        request = build_analysis_request(legacy_request, prompt_version=self.prompt_version)
         context = {k: request[k] for k in (
             'context', 'catalog', 'required_evidence_ids', 'allowed_question_codes',
             'allowed_recommendation_codes', 'required_question_codes')}
@@ -214,7 +215,7 @@ class OpenAIProvider:
         started = perf_counter()
         evidence = dict(provider='openai', requested_model=MODEL, model=None,
                         invocation_mode='offline_stub' if self._test_transport else 'live_attempt',
-                        prompt_version=PROMPT_VERSION, schema_version=SCHEMA_VERSION, settings=settings,
+                        prompt_version=self.prompt_version, schema_version=SCHEMA_VERSION, settings=settings,
                         budget_reservation_id=reservation, reserved_cost_usd=amount / 1_000_000_000,
                         usage=None, estimated_usage_cost_usd=None, schema_valid=None,
                         completed_response=False, failure_stage='provider_failure', reason='transport_error')
@@ -268,12 +269,12 @@ class OpenAIProvider:
             try:
                 ledger.finish(reservation, 'failed_or_rejected')
             except Exception:
-                pass  # Existing reservation remains counted even if logging fails.
+                evidence['reservation_finalization_failed'] = True
             raise AttemptFailure(evidence) from None
         return {'analysis': analysis, 'metadata': {
             'provider': 'openai', 'model': MODEL,
             'invocation_mode': 'offline_stub' if self._test_transport else 'live_response',
-            'prompt_version': PROMPT_VERSION, 'schema_version': SCHEMA_VERSION,
+            'prompt_version': self.prompt_version, 'schema_version': SCHEMA_VERSION,
             'settings': settings, 'latency_seconds': round(elapsed, 6), 'usage': usage,
             'schema_valid': True, 'completed_response': True,
             'reserved_cost_usd': amount / 1_000_000_000,
