@@ -2,7 +2,7 @@
 
 CEN 4010 Final Project: a bounded issue tracker for coordinating a remodel task when fixtures or materials are unavailable. Based on the Assignment 2 Solution Design Report. Synthetic data only; no employer integrations or confidential data.
 
-Phases 1–5 implement task and blocker intake, authenticated approvals, exception flags, candidate-only summaries and an integrated supervisor review package. The Phase 6A live experiment stopped after HTTP 403 on its first request. Both deterministic baselines produced candidates for nine eligible cases. The personal exercise is pending. [Technical evaluation](docs/evaluation-results.md) · [Review exercise](docs/manual-review-exercise.md)
+Phases 1–5 implement task and blocker intake, authenticated approvals, exception flags, candidate-only summaries and an integrated supervisor review package. Phase 6A run 01 received HTTP 403. In run 02 the pinned model responded, but a repeated source reference failed validation on S1. Both deterministic baselines produced candidates for nine eligible cases. The personal exercise is pending. [Technical evaluation](docs/evaluation-results.md) · [Review exercise](docs/manual-review-exercise.md)
 
 ## Setup
 

@@ -1,0 +1,106 @@
+{
+  "run": {
+    "run": "02",
+    "timestamp": "2026-11-27T02:49:25.294970+00:00",
+    "commit": "484cdfe2aa7d9757ef3263f254f243b624f6c885",
+    "model": "gpt-5.4-mini-2026-03-17",
+    "reference_version": "phase6a-reference-v2",
+    "approved_on": "2026-11-26",
+    "dataset_sha256": "d1618ef687ca3c0f11f0b2d93fe55482520d0ee7ea902b0d384cef32f11e53db",
+    "reference_sha256": "2f2baf43a64159f7f16b411ec29469fb351dccca33fcb79f20bf81807b688d0d",
+    "prompt_version": "review-focus-v1",
+    "schema_version": "bounded-analysis-v1"
+  },
+  "plan": {
+    "eligible_cases": 9,
+    "repetitions": 3,
+    "planned_requests": 27
+  },
+  "preflight": {
+    "case_id": "S9",
+    "status": "preflight_rejection",
+    "attempts": 0,
+    "reason": "invalid_required_source",
+    "timestamp": "2026-11-27T02:49:25.296811+00:00"
+  },
+  "attempts": [
+    {
+      "case_id": "S1",
+      "repetition": 1,
+      "status": "validation_rejection",
+      "elapsed_seconds": 2.3823687999974936,
+      "timestamp": "2026-11-27T02:49:27.680199+00:00",
+      "metadata": {
+        "provider": "openai",
+        "requested_model": "gpt-5.4-mini-2026-03-17",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "invocation_mode": "live_attempt",
+        "prompt_version": "review-focus-v1",
+        "schema_version": "bounded-analysis-v1",
+        "settings": {
+          "reasoning": {
+            "effort": "none"
+          },
+          "max_output_tokens": 1500,
+          "store": false
+        },
+        "completed_response": true,
+        "reason": "Fabricated or repeated evidence reference.",
+        "schema_valid": true,
+        "usage": {
+          "input_tokens": 885,
+          "output_tokens": 123
+        },
+        "estimated_usage_cost_usd": 0.00121725,
+        "latency_seconds": 2.373781,
+        "reserved_cost_usd": 0.01598775,
+        "bounded_output": {
+          "review_state": "CANDIDATE",
+          "groups": [
+            {
+              "focus_code": "TIMING_REVIEW",
+              "evidence_ids": [
+                "flag:0",
+                "flag:1"
+              ]
+            },
+            {
+              "focus_code": "SOURCE_UPDATES",
+              "evidence_ids": [
+                "source:S1-SRC-2",
+                "source:S1-SRC-1"
+              ]
+            },
+            {
+              "focus_code": "MATERIAL_READINESS",
+              "evidence_ids": [
+                "source:S1-SRC-1"
+              ]
+            }
+          ],
+          "question_codes": [
+            "VERIFY_TIMING",
+            "CHECK_SOURCE_CONTEXT"
+          ],
+          "recommendation_codes": [
+            "REQUEST_TIMING_REVIEW",
+            "REVIEW_CITED_EVIDENCE"
+          ]
+        }
+      }
+    }
+  ],
+  "disposition": "stopped_after_failed_or_ambiguous_attempt",
+  "unattempted": 26,
+  "accepted_candidates": 0,
+  "validation_rejections": 1,
+  "ledger": {
+    "run_02_matched_reservations": 1,
+    "cumulative_reservations": 2,
+    "cumulative_reserved_nanodollars": 31975500,
+    "remaining_nanodollars": 1968024500,
+    "remaining_attempt_slots": 28,
+    "provider_billed_usd": null
+  },
+  "personal_assessments": []
+}

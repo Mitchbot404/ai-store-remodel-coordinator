@@ -1,5 +1,9 @@
 # Prototype validation history
 
+## Run 02 results and human packet
+
+The complete offline suite passed **180 tests in 142.53 seconds** after the live run. Offline replay of the exact returned codes confirmed that the schema accepted the response and the evidence validator rejected the duplicated S1 source. Both journal reservations matched the cumulative ledger; the run 01 journal hash and frozen evaluation inputs were unchanged. The 15 new worksheet links, original case records, flags, archived mock packages, fallback labels and blank response fields were checked locally. No live call was used for replay or packet preparation. Codex prepared the technical analysis. Human assessments remain outstanding. [Results](evaluation-results.md)
+
 ## Run 02 offline preparation — November 26, 2026
 
 The complete Windows offline suite passed **180 tests in 139.30 seconds**. The focused adapter and evaluator suite passed **28 tests in 1.10 seconds**. In-memory HTTP success and 403 responses exercised client and returned request-ID capture, separation of those IDs from evaluation metadata, and safe error-code/type extraction. Additional checks covered malformed and oversized bodies, missing historical ledger, separate recovery approval, exclusive journals and stopping on a rejected first S1 trial.

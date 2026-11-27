@@ -1,10 +1,11 @@
 """Prepare private, offline worksheets after the live run. Never sends requests."""
+import argparse
 import json
 from pathlib import Path
 
 from coordinator.analysis import build_analysis_request, render_analysis
 from coordinator.candidates import build_request
-from live_evaluation import DATA_HASH, REFERENCE_HASH, JOURNAL, ROOT, verified_cases
+from live_evaluation import DATA_HASH, REFERENCE_HASH, JOURNAL, RUN_02_JOURNAL, ROOT, verified_cases
 
 ORDER = [
     ('S1', ('Manual', 'Mock', 'Live')), ('S2', ('Mock', 'Live', 'Manual')),
@@ -23,7 +24,8 @@ def worksheets(journal=JOURNAL, target=None):
     mocks = {r['case_id']: r for r in mock['results']}
     dataset = json.loads((ROOT / 'evaluation/cases.json').read_bytes())
     cases = {entry['id']: entry['case'] for entry in dataset['cases']}
-    target = Path(target or ROOT / 'data' / 'phase6a-personal-trials')
+    folder = 'phase6a-personal-trials-run-02' if rows[0].get('run') == '02' else 'phase6a-personal-trials'
+    target = Path(target or ROOT / 'data' / folder)
     target.mkdir(parents=True, exist_ok=False)  # Protect completed worksheets.
     guide = (ROOT / 'docs/manual-review-exercise.md').read_text(encoding='utf-8')
     index = []
@@ -54,6 +56,8 @@ def worksheets(journal=JOURNAL, target=None):
                     if result.get('status') == 'provider_failure':
                         status = result.get('metadata', {}).get('http_status')
                         detail = f'The first request returned HTTP {status}.' if status else 'The first provider request failed.'
+                    elif result.get('status') == 'validation_rejection':
+                        detail = 'The model responded, but its output failed evidence validation.'
                     elif not result and rows[-1].get('status') == 'stopped_after_failed_or_ambiguous_attempt':
                         detail = 'The run stopped before this case was sent.'
                     lines[2:2] = ['**Candidate unavailable · manual fallback.** ' + detail,
@@ -73,4 +77,6 @@ def worksheets(journal=JOURNAL, target=None):
 
 
 if __name__ == '__main__':
-    print(worksheets())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--run', choices=['01', '02'], default='01')
+    print(worksheets(RUN_02_JOURNAL if parser.parse_args().run == '02' else JOURNAL))

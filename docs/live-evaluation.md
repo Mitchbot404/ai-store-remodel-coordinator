@@ -4,11 +4,11 @@ The project owner approved the frozen v2 inputs on November 26, 2026. The previo
 
 ## Run locally
 
-### Run 02 recovery preparation
+### Run 02 recovery record
 
 The project owner reported correcting the project model allowlist from the family name to the exact snapshot already requested by the application. The dashboard review found no Responses log entry. Run 01 captured HTTP 403 only. Its cause remains unconfirmed.
 
-To verify run 02 offline from the repository, use:
+Before launch, the offline preflight used:
 
 ```powershell
 .\.venv\Scripts\python.exe -m live_evaluation --run 02 --check
@@ -16,7 +16,7 @@ To verify run 02 offline from the repository, use:
 
 This checks both frozen input hashes and reconciles run 01's stopped S1 request with its existing reservation in the Windows ledger. It creates no recovery journal and does not prompt for credentials. Run 01 retains its original journal, published result and 1 of the 30 cumulative slots.
 
-**Separate owner approval is pending.** After approval, the private-console launcher accepts `--run 02 --approve-run-02` and uses the existing hidden key prompt. The first request is **S1 repetition 1**, scored in the experiment. Its failure, including an evidence-validation rejection, stops the run. If it validates, the runner continues the existing nine-case, three-repetition schedule, up to 27 requests including that first request. S9 is rejected locally. There is no separate connectivity probe. Subsequent trials use the original stop rules. The model, prompt, references, acceptance thresholds, timeout, token limits and cumulative spending rules are unchanged.
+The owner explicitly approved run 02. The private-console launcher sent **S1 repetition 1** as the first scored request. Its schema-valid response repeated an evidence ID, triggering the first-trial stop rule. S9 was rejected locally. There was no separate probe or retry. The model, prompt, references, acceptance thresholds, timeout, token limits and cumulative spending rules were unchanged. [Run 02 results](evaluation-results.md)
 
 Run 02 exclusively creates `data/phase6a-live-v2-run-02.jsonl`. An existing recovery journal blocks a repeat launch. Keep the original run 01 journal, ledger and worksheets. Account dashboard rounding or a missing Responses log does not release run 01's reservation. Run 02 has 29 slots and $1.98401225 of conservative capacity available at preparation time. The ledger rechecks the limits at each reservation.
 
@@ -53,5 +53,7 @@ For each accepted package, check each rendered evidence ID, source link, exact a
 Assignment 2's FR-03–05, NFR-01/02 and candidate acceptance criteria govern evidence traceability, uncertainty, latency and readability. Its authority rules reserve decisions for supervisors. The Final Project and Grading Criteria call for reproducible representative and exception behavior, supported claims, disclosure of AI assistance, and a clear account of remaining limitations. This run supplies technical evidence. The owner supplies the personal review judgments. The Sporting Goods walkthrough stays supplementary and receives zero extra requests.
 
 ## Human comparison
+
+The run 02 worksheets were generated with `.\.venv\Scripts\python.exe -m prepare_trials --run 02`. Open `data/phase6a-personal-trials-run-02/START.md` for the prepared packet. The run 01 packet and any earlier responses are preserved separately. Complete the personal exercise only once.
 
 After collecting and checking the journal, run `.\.venv\Scripts\python.exe -m prepare_trials` once. Open `data/phase6a-personal-trials/START.md`, then complete files 01–15 in order. Each contains the original case, source IDs, fixed-time flags and questions. The assigned mock is the archived **bounded deterministic mock** so its evidence choices can be compared with the same live interface. The canonical mock remains a separate technical comparator. Use live repetition **one**, fixed in advance, even if a later output looks better. A missing or rejected assigned output produces a marked manual fallback. Keep personal answers local. [Timing, rating and review instructions](manual-review-exercise.md)

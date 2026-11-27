@@ -38,4 +38,4 @@ At the verified standard rates of $0.75 per million input tokens and $4.50 per m
 
 Structured output constrains syntax, not semantic factuality or usefulness. Refusals, incomplete responses and business-rule violations still need handling. [Structured output documentation](https://developers.openai.com/api/docs/guides/structured-outputs).
 
-The adapter's live endpoint compatibility and model access remain unverified until an authorized live request succeeds. All adapter tests use injected responses labeled `offline_stub`; they cannot establish live-model performance.
+Run 02 confirmed access to the pinned model for one completed response. The application rejected its repeated evidence ID. Offline test transports remain separate from live evaluation evidence. [Observed result](evaluation-results.md)

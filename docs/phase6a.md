@@ -1,6 +1,6 @@
 # Phase 6A: live integration and evaluation preparation
 
-The project owner approved reference v2 on November 26, 2026. The live run stopped at the first request after HTTP 403. The personal evaluation is pending. [Technical results](evaluation-results.md)
+The project owner approved reference v2 and authorized run 02 after run 01 received HTTP 403. Run 02 received a schema-valid response and rejected a repeated evidence ID. Both journals are retained. The personal evaluation is pending. [Technical results](evaluation-results.md)
 
 ## Minimal architecture correction
 
