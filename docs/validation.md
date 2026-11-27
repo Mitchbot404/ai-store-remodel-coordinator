@@ -1,5 +1,11 @@
 # Prototype validation history
 
+## Run 03 technical results and human exercise
+
+The complete Windows offline regression suite passed **201 tests in 144.40 seconds** after the live evaluation. Offline replay checked all 27 saved responses against the bounded schema and evidence rules and checked the displayed candidate packages against their approved case contexts. S9 stopped before transmission. The evaluation used standalone synthetic records. Each of the 29 cumulative journal reservations matched the private ledger by identifier, amount and outcome. [Results and measurement denominators](evaluation-results.md)
+
+All 15 worksheet links and case displays were checked against the original task, blocker, sources, decisions, state and flags. The five mock displays matched the archived bounded mock and the five live displays matched the validated first repetition for their cases. All personal response fields were blank. Codex prepared the technical scoring and worksheets. The project owner's timed comparison and semantic review are outstanding. [Exercise instructions](manual-review-exercise.md)
+
 ## Run 03 prompt alignment and offline preparation
 
 The final complete offline suite passed **201 tests in 139.53 seconds** (180 baseline tests plus 21 new cases). The focused prompt, adapter and runner suite passed **70 tests in 0.92 seconds**. Replaying the exact S1 choices from run 02 reproduced the duplicate-ID rejection under both versions. A separately constructed fixture passed. The mock transport exercised success, rejection and case-state invariance. Neither test measures the live model's response to v2.

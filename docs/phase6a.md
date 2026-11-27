@@ -1,6 +1,6 @@
 # Phase 6A: live integration and evaluation preparation
 
-The project owner approved reference v2 and authorized run 02 after run 01 received HTTP 403. Run 02 received a schema-valid response and rejected a repeated evidence ID. Both journals are retained. The personal evaluation is pending. [Technical results](evaluation-results.md)
+The project owner approved reference v2 and authorized run 02 after run 01 received HTTP 403. Run 02 received a schema-valid response and rejected a repeated evidence ID. Run 03 then validated 27/27 live responses using review-focus-v2, with the approved amendment. All three journals are retained. The personal evaluation is pending. [Technical results](evaluation-results.md)
 
 ## Minimal architecture correction
 
@@ -35,12 +35,12 @@ The manual output is a case packet, not evidence that a person performed the tas
 
 The additive analysis object preserves the report's candidate structure while allowing bounded choices that exact-template validation prevented. No workflow architecture, role or transition redesign was needed. All 103 original tests remain unchanged. The new live adapter and approval/budget gates are necessary for the authorized paid integration.
 
-No live model has been evaluated, and no independent human judgments, usefulness ratings or review times exist yet. The 200-word target is checked for the bounded review-aid labels/questions/recommendations, excluding evidence details; it does not establish whole-screen readability, which needs human review. The canonical package and original evidence remain separately displayed. Timing flags use a fixed generation clock; time passing alone does not invalidate the context hash. Authentication, one-blocker-per-task, trusted local administration and row-ID limitations from Phase 5 remain.
+Live technical results are available. Personal judgments, usefulness ratings and review times remain pending. The 200-word target is checked for the bounded review-aid labels/questions/recommendations, excluding evidence details; it does not establish whole-screen readability, which needs human review. The canonical package and original evidence remain separately displayed. Timing flags use a fixed generation clock; time passing alone does not invalidate the context hash. Authentication, one-blocker-per-task, trusted local administration and row-ID limitations from Phase 5 remain.
 
-The stopped run provides failure-path evidence. Live candidate quality and personal usefulness judgments remain open within Phase 6A.
+The first two runs provide failure-path evidence. Run 03 provides technical evidence and actual candidates for the outstanding personal evaluation.
 
 ## Material AI development assistance
 
-Codex assisted with code, test cases, synthetic cases, proposed reference expectations, documentation and review. Proposed references are AI-assisted drafts, not independently authored or human-validated ground truth. Review found and corrected a reserved pytest fixture name; further validation results are recorded separately. AI assistance in developing the software is distinct from the application's still-unmeasured live model.
+Codex assisted with code, test cases, synthetic cases, proposed reference expectations, documentation and review. Proposed references are AI-assisted drafts, not independently authored or human-validated ground truth. Review found and corrected a reserved pytest fixture name; further validation results are recorded separately. AI assistance in developing the software is distinct from the application's recorded live performance.
 
 See [provider configuration](provider-configuration.md), [methodology](evaluation-methodology.md), [references for owner review](reference-expectations.md), [manual exercise](manual-review-exercise.md), [results](evaluation-results.md), and [validation](validation.md).

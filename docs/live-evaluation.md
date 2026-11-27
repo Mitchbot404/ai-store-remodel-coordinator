@@ -4,7 +4,7 @@ The project owner approved the frozen v2 inputs on November 26, 2026. The previo
 
 ## Run locally
 
-Run 03 has a versioned prompt intervention and a proposed change to the first-trial stopping rule. It requires separate owner approval. [Prompt audit and proposed run 03 protocol](run03-protocol.md)
+Run 03 was separately approved and completed with 27 validated candidates. The launcher refuses to overwrite the finished journal. [Prompt audit and proposed run 03 protocol](run03-protocol.md)
 
 ### Run 02 recovery record
 
@@ -55,6 +55,8 @@ For each accepted package, check each rendered evidence ID, source link, exact a
 Assignment 2's FR-03–05, NFR-01/02 and candidate acceptance criteria govern evidence traceability, uncertainty, latency and readability. Its authority rules reserve decisions for supervisors. The Final Project and Grading Criteria call for reproducible representative and exception behavior, supported claims, disclosure of AI assistance, and a clear account of remaining limitations. This run supplies technical evidence. The owner supplies the personal review judgments. The Sporting Goods walkthrough stays supplementary and receives zero extra requests.
 
 ## Human comparison
+
+Use the run 03 packet at `data/phase6a-personal-trials-run-03/START.md`. All five assigned live worksheets contain actual accepted outputs. Earlier fallback packets remain historical.
 
 The run 02 worksheets were generated with `.\.venv\Scripts\python.exe -m prepare_trials --run 02`. Open `data/phase6a-personal-trials-run-02/START.md` for the prepared packet. The run 01 packet and any earlier responses are preserved separately. Complete the personal exercise only once.
 

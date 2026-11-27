@@ -1,8 +1,8 @@
 # Small supervisor-review exercise
 
-Use the numbered links at the end of your local START.md. Open one worksheet, start your timer, answer in that file, record the measured time, then save it before opening the next. The generator protects previously created worksheets from overwrite. [Experiment instructions](live-evaluation.md)
+Use the numbered links at the end of your local START.md. Open one worksheet, start your timer, answer in that file, record the measured time, then save it before opening the next. The generator protects previously created worksheets from overwrite. [Experiment instructions](https://github.com/Mitchbot404/ai-store-remodel-coordinator/blob/main/docs/live-evaluation.md)
 
-Trials 3, 5, 7, 11 and 13 use manual fallback in both runs. Run 01 received HTTP 403 on S1. In run 02 the model responded on S1, and evidence validation rejected a repeated source. Neither run sent S2–S5. For these five trials, assess the fallback display and leave candidate-specific judgments blank. Summarize fallback separately from the five planned manual trials and five bounded-mock trials. Use one set of 15 worksheets for the personal exercise. Keep any responses already recorded and avoid pooling repeated trials from the two packets. There are zero accepted live candidates to rate.
+Use the **run 03 packet** for the manual/mock/live comparison. Trials 3, 5, 7, 11 and 13 contain the actual validated first-repetition live packages for S1–S5. The mock trials use the archived bounded mock. Rate each assigned display and cite the original evidence when judging a candidate. The question and next-step wording is rendered locally from the model's selected codes. Judge whether the evidence selection and arrangement helped you. Keep any earlier run 01/02 fallback notes separate and report prior exposure. Avoid pooling repeated trials across packets.
 
 This worksheet is for the project owner to complete personally after reference review and after the corresponding candidate outputs are available. It contains **no participant results**. Do not begin live-condition trials using mock output as a substitute.
 

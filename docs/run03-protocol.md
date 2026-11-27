@@ -1,6 +1,6 @@
 # Run 03 prompt intervention and proposed protocol amendment
 
-**Run 03 is awaiting owner approval.** Its prompt is `review-focus-v2`. Runs 01 and 02 used `review-focus-v1`. The reference set is independently versioned as `phase6a-reference-v2`. No new live observations have been collected for this intervention.
+**The owner approved run 03 and the amended stop rule.** Its prompt is `review-focus-v2`. Runs 01 and 02 used `review-focus-v1`. The reference set is independently versioned as `phase6a-reference-v2`. All 27 scheduled requests have now completed. The table below preserves the pre-run state. [Observed results](evaluation-results.md)
 
 ## Diagnosis
 
@@ -27,7 +27,7 @@ The archived S1 output still passes its original JSON schema and fails evidence 
 
 The intervention was designed after inspecting S1. Any authorized run 03 will reuse the same frozen cases. A change in results cannot by itself establish generalization, causation or human usefulness. The proposed stopping change also affects which cases may be observed. Compare each run by its own denominator and label any cumulative numbers. Codex assisted with the diagnosis, prompt, offline replay, tests and protocol draft.
 
-## Proposed amendment for owner approval
+## Amendment approved before execution
 
 1. Start with S1 repetition 1, using the same pinned model, settings and nine eligible cases for three scheduled repetitions. Record S9 once as a pre-provider rejection. Maximum **27 additional requests**. No connectivity probe.
 2. Record each attempted trial before advancing. If a completed response from the pinned model has confirmed usage, passes the strict case-specific schema, and fails a recognized evidence rule, record the rejection and move to the **next scheduled trial**, including after S1 repetition 1. Examples include a repeated eligible ID, repeated focus, duplicate question, missing required evidence or a recognized placement error. A repeated reference in the shared fabricated/repeated error category is verified against the catalog. A rejected response produces no candidate.

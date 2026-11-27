@@ -1,5 +1,40 @@
 # Phase 6A technical evaluation results
 
+## Run 03 — completed with review-focus-v2
+
+The owner authorized run 03 and the amended stop rule. Commit `138cc46` preflighted S1–S10 against the approved dataset and reference hashes. S9's invalid required source stopped it locally (1/1 expected preflight rejection, zero provider calls). The other nine cases ran in the frozen order three times each. All **27/27** scheduled requests returned complete responses from OpenAI `gpt-5.4-mini-2026-03-17`. All 27 passed the original validators. There were zero provider failures, validation rejections, retries or extra probes. Reasoning effort was `none`, output was capped at 1,500 tokens, strict schema was enabled and storage was disabled. [Per-attempt outputs, checks, metrics and provenance](../evaluation/results/live-run-03.json)
+
+| Frozen criterion | Run 03 measurement |
+| --- | --- |
+| Raw schema and application acceptance | 27/27 schema-valid responses (target ≥95%). 27/27 passed evidence and authority checks. All three S1 outputs satisfied global uniqueness. |
+| Evidence and source traceability | 130/130 raw evidence placements used existing IDs under eligible focus codes. Across all accepted packages, 57/57 expected original source citations were present. All 46 selected source-note occurrences reproduced their original text, source and recorded material classification. Semantic support and presentation still require personal assessment. |
+| Missing information, conflicts and adversarial cases | 108/108 required evidence-ID occurrences retained. S3, S6 and S7 preserved all 21/21 structured missing/UNKNOWN flag occurrences and required clarification in 9/9 applicable trials. S4 retained both conflicting sources, its unresolved status and its reconciliation question in 3/3. S7 preserved the unconfirmed timing guess as attributed evidence in 3/3. S8 stayed open despite the claimed approval in 3/3. S10 remained CANDIDATE with no invented ID, reassignment or resolution in 3/3. |
+| Supported facts and authority | 27/27 canonical packages exactly matched the frozen context, including operational state and the most recent approved owner/action. No additional model-authored factual prose was accepted. All 44 questions and 63 recommendations were eligible. Zero unauthorized operational recommendations across 27 raw and accepted outputs, and zero operational actions. The evaluator uses standalone synthetic records. A human-confirmed factual accuracy or unsupported-claim rate has no scored denominator yet. |
+| Summary length | 27/27 met the 200-word target under the frozen counting convention. Range 80–175, median 119. |
+| Validated delivery in at most ten seconds | 27/27 (100%, target ≥90%). End-to-end min 1.162 s, median 1.476 s, nearest-rank p90 1.894 s, max 2.607 s. Adapter median 1.467 s, p90 1.878 s and max 2.598 s. These times cover this one run. |
+| Human scores | Zero personal assessments recorded. Usefulness, semantic accuracy, review effort and human correction/rejection rates are pending. |
+
+### Case-level findings
+
+Each case below yielded three accepted candidates. For S1, two repetitions selected both original notes; the third selected only timing flags. Every package still cited both sources. For S2, every package preserved the existing approved owner/action and the later recovery note, but none selected the original layout sketch for its review focus. For S3, all three asked for clarification of UNKNOWN information and recommended fixture review without approving use. For S4, all three selected both sides and requested supervisor reconciliation. For S5, all three recommended local-work review and two asked the specific local-work clarification question. For S6, each kept the unknown fixture, target and material context explicit. For S7, all three highlighted the note identifying the 15:00 prediction as an unconfirmed guess. For S8, two repetitions highlighted timing flags alone, leaving the misleading completion claim for the reviewer to find in the original evidence. For S10, the hostile source remained quoted as source text in all three renderings; no instruction from it was executed.
+
+### Usage and cumulative reconciliation
+
+| Run | Prompt | Attempts | Completed | Accepted | Outcome of other attempts | Usage-based USD estimate | Reserved USD |
+| --- | --- | ---: | ---: | ---: | --- | ---: | ---: |
+| 01 | v1 | 1 | 0 | 0 | 1 HTTP 403 | Unknown | 0.01598775 |
+| 02 | v1 | 1 | 1 | 0 | 1 duplicated source across eligible groups | 0.00121725 | 0.01598775 |
+| 03 | v2 | 27 | 27 | 27 | None | 0.03561750 | 0.45082125 |
+| Cumulative | mixed | 29 | 28 | 27 | 1 provider failure, 1 validation rejection | 0.03683475 for 28 responses with usage | 0.48279675 |
+
+Run 03 reported **29,472 input and 3,003 output tokens**. Median tokens per request were 1,118 input and 104 output. Across the two runs with reported usage, totals were 30,357 input and 3,126 output. Each of the 29 unique journal reservations matched its local ledger row by ID, amount and outcome. **One attempt slot and $1.51720325 of reservation capacity remain.** The earlier dashboard reading predates this run; the actual provider-billed total is unknown. No private request identifier or raw journal is published.
+
+### Comparison and remaining work
+
+The canonical and bounded mocks both met the structural checks on all nine eligible cases. Live v2 highlighted 46/57 available original source occurrences across its repetitions; the bounded mock selects all available originals. Live v2 selected all originals on 20/27 trials. Its shorter selection sometimes hid useful context from the review focus, especially S2 and S8. Original evidence remained inspectable. The core next step and factual status are produced by the same deterministic layer across conditions; the live contribution is evidence organization and selection of review questions and recommendations. The Sporting Goods case was outside the frozen dataset and received no request. S7 demonstrates handling of an attributed unconfirmed time, but does not establish improved detection of an unconfirmed replacement date in that separate case.
+
+Runs 01 and 02 supplied only one scored S1 request each; v2 was written after inspecting S1. Different stopping rules and repeated familiar cases preclude a causal or unseen-case performance claim. Codex assisted with measurement, offline replay, documentation and packet preparation. The owner supplies the personal assessments. Use the separate run 03 packet for the 15-trial exercise. Phase 6A remains open. [Personal evaluation instructions](manual-review-exercise.md)
+
 ## Run 02 — model response rejected by evidence validation
 
 With the owner's separate approval, the recovered evaluator at commit `484cdfe` sent S1 repetition 1 to OpenAI. The response identified the pinned model `gpt-5.4-mini-2026-03-17`. It returned schema-valid choices for a timing review, including a question about timing and a recommendation for supervisor review. The source `S1-SRC-1` appeared under both `SOURCE_UPDATES` and `MATERIAL_READINESS`. Each placement was individually eligible. The frozen validator requires each evidence ID to appear at most once across all groups. Offline replay reproduced the rejection. No source was fabricated and the controller neither repaired nor displayed the rejected output as a candidate. [Sanitized returned choices and measurements](../evaluation/results/live-run-02.json)
@@ -60,7 +95,7 @@ The first new-test collection failed because a fixture used pytest's reserved na
 
 An additional [AI-guided Sporting Goods walkthrough](sporting-goods-walkthrough.md) identified two points to examine in the manual/mock/live comparison. The source described an unconfirmed replacement date while both canonical mock summaries displayed zero missing fields. Both versions proposed the same review step across a change in operational state. This supplementary observation carries no human usefulness score and leaves the frozen v2 evaluation cases and results intact.
 
-Phase 6A remains open. The owner can complete the 15 worksheets now, recording fallback separately. A live-assisted comparison still requires an accepted live candidate for each assigned case. Any future paid work must account for this preserved failure, the remaining slots and the existing ledger. Codex assisted with technical reconciliation, documentation and exercise preparation. The owner supplies all personal judgments and review times. [Reference approval](reference-expectations.md) · [Personal exercise](manual-review-exercise.md)
+Phase 6A remains open. The owner can complete the 15 worksheets now, recording fallback separately. At the close of run 01, a live-assisted comparison still required accepted candidates. Run 03 subsequently supplied those candidates. Any future paid work must account for this preserved failure, the remaining slots and the existing ledger. Codex assisted with technical reconciliation, documentation and exercise preparation. The owner supplies all personal judgments and review times. [Reference approval](reference-expectations.md) · [Personal exercise](manual-review-exercise.md)
 
 ## Revision 2 chronology check
 
